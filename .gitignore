@@ -7,6 +7,6 @@ engine
 bin/
 *.out
 .env
-clean-arch.png
-clean_architecture.jpg
+# clean-arch.png
+# clean_architecture.jpg
 tmp/
