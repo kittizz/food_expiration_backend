@@ -1,4 +1,4 @@
-package main
+package backend
 
 import (
 	"os"
@@ -12,18 +12,26 @@ import (
 
 	"github.com/kittizz/food_expiration_backend/internal/delivery/http"
 	http_middleware "github.com/kittizz/food_expiration_backend/internal/delivery/http/middleware"
+	"github.com/kittizz/food_expiration_backend/internal/pkg/auth"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/database"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/server"
+	"github.com/kittizz/food_expiration_backend/internal/repository"
+	"github.com/kittizz/food_expiration_backend/internal/usecase"
 )
 
 func init() {
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
-
-	log.Logger = log.Output(output)
 
 	godotenv.Load(".env")
 
 	viper.AutomaticEnv()
+
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+	log.Logger = log.Output(output)
+
+	if viper.GetString("LEVEL") == "DEBUG" {
+		log.Print("DEBUG ON")
+		log.Level(zerolog.DebugLevel)
+	}
 
 	loc, err := time.LoadLocation("Asia/Bangkok")
 	if err != nil {
@@ -32,17 +40,26 @@ func init() {
 	time.Local = loc
 }
 
-func main() {
+func Run(firebaseCredentials []byte) {
 	app := fx.New(
 		fx.Provide(
 			database.NewMySQL,
+			repository.NewUserRepository,
+			repository.NewLocationRepository,
+
+			auth.NewFirebase(firebaseCredentials),
+
+			usecase.NewUserUsecase,
+			usecase.NewLocationUsecase,
 
 			server.NewEchoServer,
 			http_middleware.NewHttpMiddleware,
-			http.NewTestHandler,
+			http.NewUserHandler,
 		),
 
-		fx.Invoke(func(*http.TestHandler) {}),
+		fx.Invoke(func(_ *http.UserHandler) {
+
+		}),
 	)
 
 	app.Run()

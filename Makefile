@@ -1,4 +1,4 @@
 run:
-	go run cmd/backend/main.go
+	go run main.go
 dev:
-	air --build.cmd "go build -o bin/backend cmd/backend/main.go" --build.bin "./bin/backend"
+	air --build.cmd "go build -o bin/backend main.go" --build.bin "./bin/backend"

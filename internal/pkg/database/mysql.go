@@ -2,19 +2,26 @@ package database
 
 import (
 	"fmt"
-	"log"
+	_log "log"
 	"os"
 
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/kittizz/food_expiration_backend/internal/domain"
 )
 
-func NewMySQL() (*gorm.DB, error) {
+type DatabaseMySQL struct {
+	*gorm.DB
+}
+
+func NewMySQL() (*DatabaseMySQL, error) {
 	instance, err := gorm.Open(
 		mysql.Open(fmt.Sprintf(
-			"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4_unicode_ci&parseTime=true&loc=%s",
+			"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=true&loc=%s",
 			viper.GetString("MYSQL_USERNAME"),
 			viper.GetString("MYSQL_PASSWORD"),
 			viper.GetString("MYSQL_HOST"),
@@ -24,7 +31,7 @@ func NewMySQL() (*gorm.DB, error) {
 		)),
 		&gorm.Config{
 			Logger: logger.New(
-				log.New(os.Stdout, "\n", log.LstdFlags),
+				_log.New(os.Stdout, "\n", _log.LstdFlags),
 				logger.Config{
 					LogLevel: logger.Silent,
 				},
@@ -45,10 +52,17 @@ func NewMySQL() (*gorm.DB, error) {
 
 	if viper.GetBool("MYSQL_MIGRATE") {
 		if err := instance.AutoMigrate(
-		// &User{},
+			&domain.Article{},
+			&domain.User{},
+			&domain.Location{},
+			&domain.LocationItem{},
+			&domain.ThumbnailCategory{},
+			&domain.Thumbnail{},
 		); err != nil {
 			return nil, err
 		}
+		log.Info().Msg("Migrate database")
+		os.Exit(1)
 	}
-	return instance, nil
+	return &DatabaseMySQL{instance}, nil
 }

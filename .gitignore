@@ -10,3 +10,4 @@ bin/
 # clean-arch.png
 # clean_architecture.jpg
 tmp/
+credentials.json
