@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 
 	"github.com/kittizz/food_expiration_backend/internal/domain"
@@ -32,7 +33,6 @@ func (u *UserUsecase) VerifyIDToken(ctx context.Context, authorization string) (
 	if err != nil {
 		return nil, err
 	}
-	log.Print("token:", token)
 	authToken, err := u.auth.VerifyIDToken(ctx, token)
 	if err != nil {
 
@@ -51,9 +51,7 @@ func (u *UserUsecase) VerifyIDToken(ctx context.Context, authorization string) (
 }
 func (u *UserUsecase) Sync(ctx context.Context, user domain.User) (*domain.User, error) {
 	_user, err := u.userRepo.FetchOrCreate(ctx, user)
-	if len(_user.Locations) == 0 {
 
-	}
 	return _user, err
 }
 func (u *UserUsecase) GetAuthUserByUid(ctx context.Context, uid string) (*domain.User, error) {
@@ -71,4 +69,19 @@ func (u *UserUsecase) GetAuthUserByUid(ctx context.Context, uid string) (*domain
 		Email:          userRecord.Email,
 		SignInProvider: userRecord.ProviderID,
 	}, nil
+}
+
+// RegisterDevice implements domain.UserUsecase.
+func (u *UserUsecase) RegisterDevice(ctx context.Context, id int) (string, error) {
+
+	deviceId := uuid.New().String()
+	err := u.userRepo.UpdateByID(ctx, id, domain.User{DeviceId: &deviceId})
+
+	return deviceId, err
+}
+
+func (u *UserUsecase) GetUserByDeviceId(ctx context.Context, deviceId string) (*domain.User, error) {
+	return u.userRepo.Fetch(ctx, domain.User{
+		DeviceId: &deviceId,
+	})
 }

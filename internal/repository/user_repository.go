@@ -22,3 +22,21 @@ func (repo *UserRepository) FetchOrCreate(ctx context.Context, user domain.User)
 		Assign(user).
 		FirstOrCreate(&user).Error
 }
+
+// Fetch by uid,deviceid
+func (repo *UserRepository) Fetch(ctx context.Context, user domain.User) (*domain.User, error) {
+
+	err := repo.db.WithContext(ctx).
+		Where(domain.User{
+			Uid:      user.Uid,
+			DeviceId: user.DeviceId,
+		}).First(&user).Error
+	return &user, err
+}
+
+// Update implements domain.UserRepository.
+func (repo *UserRepository) UpdateByID(ctx context.Context, id int, user domain.User) error {
+	return repo.db.WithContext(ctx).
+		Where("id = ?", id).
+		Updates(user).Error
+}

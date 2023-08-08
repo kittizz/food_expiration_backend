@@ -46,19 +46,23 @@ func Run(firebaseCredentials []byte) {
 			database.NewMySQL,
 			repository.NewUserRepository,
 			repository.NewLocationRepository,
+			repository.NewBlogRepository,
 
 			auth.NewFirebase(firebaseCredentials),
 
 			usecase.NewUserUsecase,
 			usecase.NewLocationUsecase,
+			usecase.NewBlogUsecase,
 
 			server.NewEchoServer,
+
 			http_middleware.NewHttpMiddleware,
+
 			http.NewUserHandler,
+			http.NewBlogHandler,
 		),
 
-		fx.Invoke(func(_ *http.UserHandler) {
-
+		fx.Invoke(func(*http.UserHandler, *http.BlogHandler) {
 		}),
 	)
 

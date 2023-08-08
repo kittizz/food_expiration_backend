@@ -1,6 +1,8 @@
 package http
 
 import (
+	"log"
+
 	"github.com/labstack/echo/v4"
 
 	http_middleware "github.com/kittizz/food_expiration_backend/internal/delivery/http/middleware"
@@ -26,18 +28,53 @@ func NewUserHandler(
 		middleware:      middleware,
 		locationUsecase: locationUsecase,
 	}
-	group := e.Group("/user", middleware.UserAuth)
+	unAuth := e.Group("/user")
 	{
-		group.GET("", handler.GetUser)
+		unAuth.POST("/register-device", handler.RegisteDevicer)
+
+	}
+
+	authed := e.Group("/user", handler.middleware.UserDeviceId)
+	{
+		authed.GET("", handler.GetUser)
 
 	}
 	e.GET("/test_token", handler.TestToken)
 	return handler
 }
 
-func (h *UserHandler) GetUser(c echo.Context) error {
-	user := request.UserFrom(c)
-	return c.JSON(200, user)
+type RegisteDevicerRequest struct {
+	AuthToken string `json:"auth_token"`
+}
+
+func (h *UserHandler) RegisteDevicer(c echo.Context) error {
+
+	var req RegisteDevicerRequest
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user, err := h.userUsecase.VerifyIDToken(c.Request().Context(), req.AuthToken)
+	if err != nil {
+		log.Print(err)
+		return c.JSON(request.StatusCode(domain.ErrTokenExpired), request.ResponseError{Message: domain.ErrTokenExpired.Error()})
+	}
+
+	user, err = h.userUsecase.Sync(c.Request().Context(), *user)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	deviceId, err := h.userUsecase.RegisterDevice(c.Request().Context(), user.ID)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	user.DeviceId = &deviceId
+
+	return c.JSON(200, echo.Map{
+		"deviceId": deviceId,
+	})
 }
 
 func (h *UserHandler) TestToken(c echo.Context) error {
@@ -46,4 +83,9 @@ func (h *UserHandler) TestToken(c echo.Context) error {
 		return err
 	}
 	return c.String(200, token)
+}
+
+func (h *UserHandler) GetUser(c echo.Context) error {
+	user := request.UserFrom(c)
+	return c.JSON(200, user)
 }

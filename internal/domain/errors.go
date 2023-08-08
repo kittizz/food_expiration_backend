@@ -15,4 +15,6 @@ var (
 	ErrBadParamInput = errors.New("given Param is not valid")
 
 	ErrTokenExpired = errors.New("token expiration")
+
+	ErrInvalidDeviceId = errors.New("invalid device id")
 )

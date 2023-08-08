@@ -52,17 +52,17 @@ func NewMySQL() (*DatabaseMySQL, error) {
 
 	if viper.GetBool("MYSQL_MIGRATE") {
 		if err := instance.AutoMigrate(
-			&domain.Article{},
 			&domain.User{},
 			&domain.Location{},
 			&domain.LocationItem{},
 			&domain.ThumbnailCategory{},
 			&domain.Thumbnail{},
+			&domain.Blog{},
 		); err != nil {
 			return nil, err
 		}
 		log.Info().Msg("Migrate database")
 		os.Exit(1)
 	}
-	return &DatabaseMySQL{instance}, nil
+	return &DatabaseMySQL{instance.Debug()}, nil
 }

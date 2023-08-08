@@ -18,8 +18,8 @@ func StatusCode(err error) int {
 		return http.StatusNotFound
 	case domain.ErrConflict:
 		return http.StatusConflict
-	case domain.ErrTokenExpired:
-		return http.StatusUnauthorized
+	case domain.ErrTokenExpired, domain.ErrInvalidDeviceId:
+		return http.StatusBadRequest
 	default:
 		return http.StatusInternalServerError
 	}
