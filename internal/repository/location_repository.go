@@ -31,7 +31,7 @@ func (repo *LocationRepository) List(ctx context.Context, query domain.Location)
 	var result []*domain.Location
 	err := repo.db.WithContext(ctx).
 		Where(domain.Location{ID: query.ID, UserID: query.UserID}).
-		First(&result).Error
+		Find(&result).Error
 	return result, err
 }
 func (repo *LocationRepository) Delete(ctx context.Context, location domain.Location) error {

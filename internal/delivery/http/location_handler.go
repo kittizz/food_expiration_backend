@@ -65,7 +65,7 @@ func (h *LocationHandler) CreateLocation(c echo.Context) error {
 	if err := h.locationUsecase.Create(c.Request().Context(), location); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
-	return c.JSON(http.StatusCreated, location)
+	return c.JSON(http.StatusCreated, nil)
 }
 
 func (h *LocationHandler) DeleteLocation(c echo.Context) error {
