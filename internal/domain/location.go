@@ -8,24 +8,29 @@ import (
 )
 
 type Location struct {
-	ID        int            `gorm:"primarykey"`
+	ID        int            `gorm:"primarykey" json:"id"`
 	CreatedAt time.Time      `json:"-"`
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Name        string `gorm:"type:varchar(255);uniqueIndex:idx_name_user_id"`
-	Description string `gorm:"type:varchar(255)"`
-	Image       string `gorm:"type:varchar(255)"`
+	Name        string `gorm:"type:varchar(255);uniqueIndex:idx_name_user_id" json:"name"`
+	Description string `gorm:"type:varchar(255)" json:"description"`
+	Image       string `gorm:"type:varchar(255)" json:"image"`
 
-	UserID        int `gorm:"uniqueIndex:idx_name_user_id"`
+	UserID        int `gorm:"uniqueIndex:idx_name_user_id" json:"-"`
 	LocationItems []LocationItem
 }
 
 type LocationRepository interface {
-	Create(ctx context.Context, location *Location) error
+	Create(ctx context.Context, location Location) error
 	Fetch(ctx context.Context, id int) (*Location, error)
+	List(ctx context.Context, location Location) ([]*Location, error)
+	Delete(ctx context.Context, location Location) error
 }
 
 type LocationUsecase interface {
-	Create(ctx context.Context, location *Location) error
+	Create(ctx context.Context, location Location) error
+	Fetch(ctx context.Context, id int) (*Location, error)
+	List(ctx context.Context, location Location) ([]*Location, error)
+	Delete(ctx context.Context, location Location) error
 }

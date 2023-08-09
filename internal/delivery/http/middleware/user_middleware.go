@@ -7,7 +7,7 @@ import (
 	"github.com/kittizz/food_expiration_backend/internal/pkg/request"
 )
 
-func (m *HttpMiddleware) UserDeviceId(next echo.HandlerFunc) echo.HandlerFunc {
+func (m *HttpMiddleware) AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		deviceId := c.Request().URL.Query().Get("deviceId")

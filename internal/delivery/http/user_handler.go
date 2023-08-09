@@ -12,21 +12,19 @@ import (
 )
 
 type UserHandler struct {
-	middleware      *http_middleware.HttpMiddleware
-	userUsecase     domain.UserUsecase
-	locationUsecase domain.LocationUsecase
+	middleware  *http_middleware.HttpMiddleware
+	userUsecase domain.UserUsecase
 }
 
 func NewUserHandler(
 	e *server.EchoServer,
 	middleware *http_middleware.HttpMiddleware,
 	userUsecase domain.UserUsecase,
-	locationUsecase domain.LocationUsecase,
+
 ) *UserHandler {
 	handler := &UserHandler{
-		userUsecase:     userUsecase,
-		middleware:      middleware,
-		locationUsecase: locationUsecase,
+		userUsecase: userUsecase,
+		middleware:  middleware,
 	}
 	unAuth := e.Group("/user")
 	{
@@ -34,7 +32,7 @@ func NewUserHandler(
 
 	}
 
-	authed := e.Group("/user", handler.middleware.UserDeviceId)
+	authed := e.Group("/user", handler.middleware.AuthMiddleware)
 	{
 		authed.GET("", handler.GetUser)
 

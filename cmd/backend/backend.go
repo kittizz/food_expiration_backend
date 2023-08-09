@@ -60,9 +60,10 @@ func Run(firebaseCredentials []byte) {
 
 			http.NewUserHandler,
 			http.NewBlogHandler,
+			http.NewLocationHandler,
 		),
 
-		fx.Invoke(func(*http.UserHandler, *http.BlogHandler) {
+		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler) {
 		}),
 	)
 
