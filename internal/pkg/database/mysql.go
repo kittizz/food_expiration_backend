@@ -5,13 +5,10 @@ import (
 	_log "log"
 	"os"
 
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-
-	"github.com/kittizz/food_expiration_backend/internal/domain"
 )
 
 type DatabaseMySQL struct {
@@ -50,19 +47,5 @@ func NewMySQL() (*DatabaseMySQL, error) {
 	db.SetMaxIdleConns(50)
 	db.SetMaxOpenConns(50)
 
-	if viper.GetBool("MYSQL_MIGRATE") {
-		if err := instance.AutoMigrate(
-			&domain.User{},
-			&domain.Location{},
-			&domain.LocationItem{},
-			&domain.ThumbnailCategory{},
-			&domain.Thumbnail{},
-			&domain.Blog{},
-		); err != nil {
-			return nil, err
-		}
-		log.Info().Msg("Migrate database")
-		os.Exit(1)
-	}
 	return &DatabaseMySQL{instance.Debug()}, nil
 }
