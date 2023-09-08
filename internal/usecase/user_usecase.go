@@ -43,8 +43,13 @@ func (u *UserUsecase) VerifyIDToken(ctx context.Context, authorization string) (
 		return nil, err
 	}
 
+	var email string
+	if v, ok := authToken.Firebase.Identities["email"]; ok {
+		email = v.([]any)[0].(string)
+	}
+
 	return &domain.User{
-		Email:          authToken.Firebase.Identities["email"].([]any)[0].(string),
+		Email:          email,
 		SignInProvider: authToken.Firebase.SignInProvider,
 		Uid:            authToken.UID,
 	}, nil

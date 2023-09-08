@@ -10,4 +10,5 @@ bin/
 # clean-arch.png
 # clean_architecture.jpg
 tmp/
-credentials.json
+firebase-adminsdk.json
+credentials-s3.json

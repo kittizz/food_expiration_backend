@@ -59,8 +59,9 @@ func (h *LocationHandler) CreateLocation(c echo.Context) error {
 	location := domain.Location{
 		Name:        req.Name,
 		Description: req.Description,
-		Image:       req.Image,
-		UserID:      user.ID,
+		//TODO: change to
+		// Image:       req.Image,
+		UserID: user.ID,
 	}
 	if err := h.locationUsecase.Create(c.Request().Context(), location); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})

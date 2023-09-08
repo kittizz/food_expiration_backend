@@ -12,8 +12,10 @@ type ThumbnailCategory struct {
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Name  string `gorm:"type:varchar(255)"`
-	Image string `gorm:"type:varchar(255)"`
+	Name string `gorm:"type:varchar(255)"`
+
+	ImageID int
+	Image   Image
 
 	Thumbnails []Thumbnail
 }

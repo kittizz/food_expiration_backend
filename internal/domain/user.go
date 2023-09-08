@@ -17,6 +17,8 @@ type User struct {
 	SignInProvider string `gorm:"type:varchar(64)" json:"signInProvider"`
 	Uid            string `gorm:"unique;type:varchar(64)" json:"-"`
 
+	Role string `gorm:"type:varchar(64);default:'user'" json:"role"`
+
 	DeviceId *string `gorm:"type:varchar(36);uniqueIndex;" json:"-"`
 
 	Locations []Location `json:"locations,omitempty" `

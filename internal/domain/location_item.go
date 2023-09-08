@@ -14,8 +14,11 @@ type LocationItem struct {
 
 	Name        string `gorm:"type:varchar(255)"`
 	Description string `gorm:"type:varchar(255)"`
-	Image       string `gorm:"type:varchar(255)"`
-	ExpiryDate  time.Time
+
+	ImageID int
+	Image   Image
+
+	ExpiryDate time.Time
 
 	IsArchived  bool `gorm:"type:boolean"`
 	ForewarnDay int  `gorm:"type:int"`

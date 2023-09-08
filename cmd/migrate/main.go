@@ -25,6 +25,7 @@ func main() {
 		&domain.ThumbnailCategory{},
 		&domain.Thumbnail{},
 		&domain.Blog{},
+		&domain.Image{},
 	); err != nil {
 		panic(err)
 

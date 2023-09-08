@@ -6,7 +6,7 @@ import (
 	"github.com/kittizz/food_expiration_backend/cmd/backend"
 )
 
-//go:embed credentials.json
+//go:embed firebase-adminsdk.json
 var firebaseCredentials []byte
 
 func main() {

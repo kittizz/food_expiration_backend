@@ -15,7 +15,9 @@ type Location struct {
 
 	Name        string `gorm:"type:varchar(255);uniqueIndex:idx_name_user_id" json:"name"`
 	Description string `gorm:"type:varchar(255)" json:"description"`
-	Image       string `gorm:"type:varchar(255)" json:"image"`
+
+	ImageID int
+	Image   Image
 
 	UserID        int `gorm:"uniqueIndex:idx_name_user_id" json:"-"`
 	LocationItems []LocationItem

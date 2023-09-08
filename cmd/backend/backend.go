@@ -13,6 +13,7 @@ import (
 	"github.com/kittizz/food_expiration_backend/internal/delivery/http"
 	http_middleware "github.com/kittizz/food_expiration_backend/internal/delivery/http/middleware"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/auth"
+	"github.com/kittizz/food_expiration_backend/internal/pkg/bucket"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/database"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/server"
 	"github.com/kittizz/food_expiration_backend/internal/repository"
@@ -47,23 +48,26 @@ func Run(firebaseCredentials []byte) {
 			repository.NewUserRepository,
 			repository.NewLocationRepository,
 			repository.NewBlogRepository,
+			repository.NewImageRepository,
 
 			auth.NewFirebase(firebaseCredentials),
+			bucket.NewBucket,
+			server.NewEchoServer,
 
 			usecase.NewUserUsecase,
 			usecase.NewLocationUsecase,
 			usecase.NewBlogUsecase,
-
-			server.NewEchoServer,
+			usecase.NewImageUsecase,
 
 			http_middleware.NewHttpMiddleware,
 
 			http.NewUserHandler,
 			http.NewBlogHandler,
 			http.NewLocationHandler,
+			http.NewImageHandler,
 		),
 
-		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler) {
+		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler, *http.ImageHandler) {
 		}),
 	)
 

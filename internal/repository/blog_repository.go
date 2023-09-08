@@ -27,7 +27,7 @@ func (r *BlogRepository) List(ctx context.Context, isRandom bool, limit int) ([]
 	if limit > 0 {
 		q = q.Limit(limit)
 	}
-	err := q.Find(&blogs).Error
+	err := q.Joins("Image").Find(&blogs).Error
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (r *BlogRepository) GetByID(ctx context.Context, id int) (*domain.Blog, err
 	var blog domain.Blog
 	err := r.db.WithContext(ctx).Where(domain.Blog{
 		ID: id,
-	}).First(&blog).Error
+	}).Joins("Image").First(&blog).Error
 	if err != nil {
 		return nil, err
 	}
