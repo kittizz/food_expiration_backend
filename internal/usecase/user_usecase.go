@@ -1,24 +1,35 @@
 package usecase
 
 import (
+	"bytes"
 	"context"
+	"io"
+	"mime/multipart"
+	"path"
 
 	"github.com/google/uuid"
+	"github.com/minio/minio-go/v7"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 
 	"github.com/kittizz/food_expiration_backend/internal/domain"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/auth"
+	"github.com/kittizz/food_expiration_backend/internal/pkg/bucket"
 )
 
 type UserUsecase struct {
-	auth     *auth.Firebase
-	userRepo domain.UserRepository
+	auth      *auth.Firebase
+	userRepo  domain.UserRepository
+	bucket    *bucket.Bucket
+	imageRepo domain.ImageRepository
 }
 
-func NewUserUsecase(auth *auth.Firebase, userRepo domain.UserRepository) domain.UserUsecase {
+func NewUserUsecase(auth *auth.Firebase, userRepo domain.UserRepository, bucket *bucket.Bucket, imageRepo domain.ImageRepository) domain.UserUsecase {
 	return &UserUsecase{
-		auth:     auth,
-		userRepo: userRepo,
+		auth:      auth,
+		userRepo:  userRepo,
+		bucket:    bucket,
+		imageRepo: imageRepo,
 	}
 }
 
@@ -89,4 +100,40 @@ func (u *UserUsecase) GetUserByDeviceId(ctx context.Context, deviceId string) (*
 	return u.userRepo.Fetch(ctx, domain.User{
 		DeviceId: &deviceId,
 	})
+}
+
+func (u *UserUsecase) ChangeProfile(ctx context.Context, file *multipart.FileHeader, userId int) error {
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	filename := uuid.New().String() + path.Ext(file.Filename)
+	path := "/images/" + filename
+
+	_bytes, err := io.ReadAll(src)
+	if err != nil {
+		return err
+	}
+
+	buf := bytes.NewBuffer(_bytes)
+
+	_, err = u.bucket.PutObject(
+		ctx,
+		viper.GetString("BUCKET_NAME"),
+		path,
+		buf,
+		file.Size,
+		minio.PutObjectOptions{ContentType: file.Header.Get("content-type")},
+	)
+	if err != nil {
+		return err
+	}
+
+	err = u.userRepo.UpdateByID(ctx, userId, domain.User{ProfilePicture: &path})
+	if err != nil {
+		return err
+	}
+	return nil
 }

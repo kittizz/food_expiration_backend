@@ -2,6 +2,7 @@ package http
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 
@@ -35,6 +36,7 @@ func NewUserHandler(
 	authed := e.Group("/user", handler.middleware.AuthMiddleware)
 	{
 		authed.GET("", handler.GetUser)
+		authed.POST("/change-profilepicture", handler.ChangeProfilePicture)
 
 	}
 	e.GET("/test_token", handler.TestToken)
@@ -43,6 +45,8 @@ func NewUserHandler(
 
 type RegisteDevicerRequest struct {
 	AuthToken string `json:"auth_token"`
+
+	Nickname string `json:"nickname"`
 }
 
 func (h *UserHandler) RegisteDevicer(c echo.Context) error {
@@ -86,4 +90,18 @@ func (h *UserHandler) TestToken(c echo.Context) error {
 func (h *UserHandler) GetUser(c echo.Context) error {
 	user := request.UserFrom(c)
 	return c.JSON(200, user)
+}
+
+func (h *UserHandler) ChangeProfilePicture(c echo.Context) error {
+	user := request.UserFrom(c)
+	file, err := c.FormFile("file")
+	if err != nil {
+		return err
+	}
+	err = h.userUsecase.ChangeProfile(c.Request().Context(), file, user.ID)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	return c.NoContent(http.StatusOK)
 }

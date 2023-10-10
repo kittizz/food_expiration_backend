@@ -1,6 +1,8 @@
 package http
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 
 	http_middleware "github.com/kittizz/food_expiration_backend/internal/delivery/http/middleware"
@@ -32,6 +34,10 @@ func NewImageHandler(
 		authed.POST("/upload", handler.UploadImage)
 
 	}
+	unAuth := e.Group("/image")
+	{
+		unAuth.GET("/banner", handler.Getbanner)
+	}
 	return handler
 }
 
@@ -43,6 +49,16 @@ func (h *ImageHandler) UploadImage(c echo.Context) error {
 		return err
 	}
 	err = h.imageUsecase.UploadImage(c.Request().Context(), file, user.ID)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
 
-	return err
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *ImageHandler) Getbanner(c echo.Context) error {
+	// TODO: Implement Getbanner from database
+	return c.JSON(200, echo.Map{
+		"banner": "/images/banner-onlygf.png",
+	})
 }

@@ -22,7 +22,7 @@ type Image struct {
 }
 
 type ImageRepository interface {
-	Create(ctx context.Context, image Image) error
+	Create(ctx context.Context, image *Image) error
 }
 
 type ImageUsecase interface {

@@ -75,7 +75,7 @@ func (u *ImageUsecase) UploadImage(ctx context.Context, file *multipart.FileHead
 		return err
 	}
 
-	err = u.imageRepo.Create(ctx, domain.Image{
+	err = u.imageRepo.Create(ctx, &domain.Image{
 		Path:     path,
 		BlurHash: hash,
 		UserID:   userId,

@@ -16,7 +16,7 @@ func NewImageRepository(db *database.DatabaseMySQL) domain.ImageRepository {
 }
 
 // Create implements domain.ImageRepository.
-func (repo *ImageRepository) Create(ctx context.Context, image domain.Image) error {
+func (repo *ImageRepository) Create(ctx context.Context, image *domain.Image) error {
 	return repo.db.WithContext(ctx).
 		Create(&image).Error
 }

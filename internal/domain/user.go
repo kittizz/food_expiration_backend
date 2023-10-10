@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"mime/multipart"
 	"time"
 
 	"gorm.io/gorm"
@@ -19,9 +20,13 @@ type User struct {
 
 	Role string `gorm:"type:varchar(64);default:'user'" json:"role"`
 
+	Nickname *string `gorm:"type:varchar(64)" json:"nickname"`
+
 	DeviceId *string `gorm:"type:varchar(36);uniqueIndex;" json:"-"`
 
-	Locations []Location `json:"locations,omitempty" `
+	ProfilePicture *string `gorm:"type:varchar(255)" json:"profilePicture"`
+
+	Locations []Location `json:"locations,omitempty"`
 }
 
 type UserUsecase interface {
@@ -31,6 +36,7 @@ type UserUsecase interface {
 	GenerateIDToken(ctx context.Context, uid string) (string, error)
 	Sync(ctx context.Context, user User) (*User, error)
 	GetUserByDeviceId(ctx context.Context, deviceId string) (*User, error)
+	ChangeProfile(ctx context.Context, file *multipart.FileHeader, userId int) error
 }
 
 type UserRepository interface {
