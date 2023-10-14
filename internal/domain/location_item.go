@@ -12,16 +12,16 @@ type LocationItem struct {
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Name        string `gorm:"type:varchar(255)"`
-	Description string `gorm:"type:varchar(255)"`
+	Name        string `gorm:"type:varchar(255)" json:"name"`
+	Description string `gorm:"type:varchar(255)" json:"description"`
 
-	ImageID int
-	Image   Image
+	ImageID int   `json:"-"`
+	Image   Image `json:"image"`
 
-	ExpiryDate time.Time
+	ExpiryDate time.Time `json:"expiryDate"`
 
-	IsArchived  bool `gorm:"type:boolean"`
-	ForewarnDay int  `gorm:"type:int"`
+	IsArchived  bool `gorm:"type:boolean" json:"isArchived"`
+	ForewarnDay int  `gorm:"type:int" json:"forewarnDay"`
 
-	LocationID int
+	LocationID int `json:"locationID"`
 }

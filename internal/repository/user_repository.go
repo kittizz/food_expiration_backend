@@ -14,7 +14,7 @@ type UserRepository struct {
 func NewUserRepository(db *database.DatabaseMySQL) domain.UserRepository {
 	return &UserRepository{db}
 }
-func (repo *UserRepository) FetchOrCreate(ctx context.Context, user domain.User) (*domain.User, error) {
+func (repo *UserRepository) GetOrCreate(ctx context.Context, user domain.User) (*domain.User, error) {
 	return &user, repo.db.WithContext(ctx).
 		Where(domain.User{
 			Uid: user.Uid,
@@ -23,8 +23,8 @@ func (repo *UserRepository) FetchOrCreate(ctx context.Context, user domain.User)
 		FirstOrCreate(&user).Error
 }
 
-// Fetch by uid,deviceid
-func (repo *UserRepository) Fetch(ctx context.Context, user domain.User) (*domain.User, error) {
+// Get by uid,deviceid
+func (repo *UserRepository) Get(ctx context.Context, user domain.User) (*domain.User, error) {
 
 	err := repo.db.WithContext(ctx).
 		Where(domain.User{

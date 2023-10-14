@@ -24,9 +24,10 @@ type User struct {
 
 	DeviceId *string `gorm:"type:varchar(36);uniqueIndex;" json:"-"`
 
-	ProfilePicture *string `gorm:"type:varchar(255)" json:"profilePicture"`
+	ProfilePicture         *string `gorm:"type:varchar(255)" json:"profilePicture"`
+	ProfilePictureBlurHash *string `gorm:"type:varchar(30)" json:"profilePictureBlurHash"`
 
-	Locations []Location `json:"locations,omitempty"`
+	Locations []Location `json:"-"`
 }
 
 type UserUsecase interface {
@@ -36,11 +37,12 @@ type UserUsecase interface {
 	GenerateIDToken(ctx context.Context, uid string) (string, error)
 	Sync(ctx context.Context, user User) (*User, error)
 	GetUserByDeviceId(ctx context.Context, deviceId string) (*User, error)
-	ChangeProfile(ctx context.Context, file *multipart.FileHeader, userId int) error
+	ChangeProfile(ctx context.Context, file *multipart.FileHeader, hash string, userId int) error
+	ChangeNickname(ctx context.Context, nickname string, userId int) error
 }
 
 type UserRepository interface {
-	FetchOrCreate(ctx context.Context, user User) (*User, error)
-	Fetch(ctx context.Context, user User) (*User, error)
+	GetOrCreate(ctx context.Context, user User) (*User, error)
+	Get(ctx context.Context, user User) (*User, error)
 	UpdateByID(ctx context.Context, id int, user User) error
 }

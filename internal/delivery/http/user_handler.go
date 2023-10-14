@@ -13,19 +13,22 @@ import (
 )
 
 type UserHandler struct {
-	middleware  *http_middleware.HttpMiddleware
-	userUsecase domain.UserUsecase
+	middleware   *http_middleware.HttpMiddleware
+	userUsecase  domain.UserUsecase
+	imageUsecase domain.ImageUsecase
 }
 
 func NewUserHandler(
 	e *server.EchoServer,
 	middleware *http_middleware.HttpMiddleware,
 	userUsecase domain.UserUsecase,
+	imageUsecase domain.ImageUsecase,
 
 ) *UserHandler {
 	handler := &UserHandler{
-		userUsecase: userUsecase,
-		middleware:  middleware,
+		userUsecase:  userUsecase,
+		middleware:   middleware,
+		imageUsecase: imageUsecase,
 	}
 	unAuth := e.Group("/user")
 	{
@@ -37,6 +40,7 @@ func NewUserHandler(
 	{
 		authed.GET("", handler.GetUser)
 		authed.POST("/change-profilepicture", handler.ChangeProfilePicture)
+		authed.POST("/change-nickname", handler.ChangeNickname)
 
 	}
 	e.GET("/test_token", handler.TestToken)
@@ -88,17 +92,50 @@ func (h *UserHandler) TestToken(c echo.Context) error {
 }
 
 func (h *UserHandler) GetUser(c echo.Context) error {
-	user := request.UserFrom(c)
+	user := *request.UserFrom(c)
+
+	if user.ProfilePictureBlurHash == nil || user.ProfilePicture == nil {
+		str := "LIEpzCa#1mt7EjWB?Hof5Xoe}fR%"
+		str2 := "/images/user.png"
+		user.ProfilePictureBlurHash = &str
+		user.ProfilePicture = &str2
+	}
 	return c.JSON(200, user)
 }
 
 func (h *UserHandler) ChangeProfilePicture(c echo.Context) error {
 	user := request.UserFrom(c)
+
 	file, err := c.FormFile("file")
 	if err != nil {
 		return err
 	}
-	err = h.userUsecase.ChangeProfile(c.Request().Context(), file, user.ID)
+	err = h.userUsecase.ChangeProfile(c.Request().Context(), file, c.FormValue("hash"), user.ID)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	if user.ProfilePicture != nil {
+		err := h.imageUsecase.DeleteWithPath(c.Request().Context(), *user.ProfilePicture)
+		if err != nil {
+			return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+		}
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+type changeNicknameRequest struct {
+	Nickname string `json:"nickname"`
+}
+
+func (h *UserHandler) ChangeNickname(c echo.Context) error {
+	var req changeNicknameRequest
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := request.UserFrom(c)
+	err := h.userUsecase.ChangeNickname(c.Request().Context(), req.Nickname, user.ID)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}

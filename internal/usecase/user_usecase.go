@@ -3,10 +3,12 @@ package usecase
 import (
 	"bytes"
 	"context"
+	"image"
 	"io"
 	"mime/multipart"
 	"path"
 
+	"github.com/bbrks/go-blurhash"
 	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/rs/zerolog/log"
@@ -66,7 +68,7 @@ func (u *UserUsecase) VerifyIDToken(ctx context.Context, authorization string) (
 	}, nil
 }
 func (u *UserUsecase) Sync(ctx context.Context, user domain.User) (*domain.User, error) {
-	_user, err := u.userRepo.FetchOrCreate(ctx, user)
+	_user, err := u.userRepo.GetOrCreate(ctx, user)
 
 	return _user, err
 }
@@ -97,12 +99,12 @@ func (u *UserUsecase) RegisterDevice(ctx context.Context, id int) (string, error
 }
 
 func (u *UserUsecase) GetUserByDeviceId(ctx context.Context, deviceId string) (*domain.User, error) {
-	return u.userRepo.Fetch(ctx, domain.User{
+	return u.userRepo.Get(ctx, domain.User{
 		DeviceId: &deviceId,
 	})
 }
 
-func (u *UserUsecase) ChangeProfile(ctx context.Context, file *multipart.FileHeader, userId int) error {
+func (u *UserUsecase) ChangeProfile(ctx context.Context, file *multipart.FileHeader, hash string, userId int) error {
 	src, err := file.Open()
 	if err != nil {
 		return err
@@ -110,13 +112,28 @@ func (u *UserUsecase) ChangeProfile(ctx context.Context, file *multipart.FileHea
 	defer src.Close()
 
 	filename := uuid.New().String() + path.Ext(file.Filename)
-	path := "/images/" + filename
+	path := "/images/profile-picture/" + filename
 
 	_bytes, err := io.ReadAll(src)
 	if err != nil {
 		return err
 	}
 
+	if hash == "" {
+		buf := bytes.NewBuffer(_bytes)
+
+		// Compute the BlurHash
+		img, _, err := image.Decode(buf) // Note that image.Decode needs your file to be an image type it recognizes.
+		if err != nil {
+			return err
+		}
+
+		hash, err = blurhash.Encode(4, 3, img)
+		if err != nil {
+			return err
+		}
+
+	}
 	buf := bytes.NewBuffer(_bytes)
 
 	_, err = u.bucket.PutObject(
@@ -131,7 +148,15 @@ func (u *UserUsecase) ChangeProfile(ctx context.Context, file *multipart.FileHea
 		return err
 	}
 
-	err = u.userRepo.UpdateByID(ctx, userId, domain.User{ProfilePicture: &path})
+	err = u.userRepo.UpdateByID(ctx, userId, domain.User{ProfilePicture: &path, ProfilePictureBlurHash: &hash})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UserUsecase) ChangeNickname(ctx context.Context, nickname string, userId int) error {
+	err := u.userRepo.UpdateByID(ctx, userId, domain.User{Nickname: &nickname})
 	if err != nil {
 		return err
 	}

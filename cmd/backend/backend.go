@@ -45,10 +45,13 @@ func Run(firebaseCredentials []byte) {
 	app := fx.New(
 		fx.Provide(
 			database.NewMySQL,
+
 			repository.NewUserRepository,
 			repository.NewLocationRepository,
 			repository.NewBlogRepository,
 			repository.NewImageRepository,
+			repository.NewThumbnailCategoryRepository,
+			repository.NewThumbnailRepository,
 
 			auth.NewFirebase(firebaseCredentials),
 			bucket.NewBucket,
@@ -58,6 +61,8 @@ func Run(firebaseCredentials []byte) {
 			usecase.NewLocationUsecase,
 			usecase.NewBlogUsecase,
 			usecase.NewImageUsecase,
+			usecase.NewThumbnailCategoryUsecase,
+			usecase.NewThumbnail,
 
 			http_middleware.NewHttpMiddleware,
 
@@ -65,9 +70,10 @@ func Run(firebaseCredentials []byte) {
 			http.NewBlogHandler,
 			http.NewLocationHandler,
 			http.NewImageHandler,
+			http.NewThumbnailHandler,
 		),
 
-		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler, *http.ImageHandler) {
+		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler, *http.ImageHandler, *http.ThumbnailHandler) {
 		}),
 	)
 

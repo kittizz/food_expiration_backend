@@ -26,11 +26,29 @@ func NewLocationHandler(e *server.EchoServer, middleware *http_middleware.HttpMi
 
 	group := e.Group("/location", h.middleware.AuthMiddleware)
 	{
+		group.GET("", h.GetLocation)
 		group.GET("/list", h.GetLocationList)
 		group.POST("", h.CreateLocation)
 		group.DELETE("", h.DeleteLocation)
+		group.PATCH("", h.UpdateLocation)
 	}
 	return h
+}
+
+func (h *LocationHandler) GetLocation(c echo.Context) error {
+	id, err := strconv.Atoi(c.QueryParam("id"))
+	if err != nil {
+		return err
+	}
+
+	items := c.QueryParam("items") == "true"
+
+	location, err := h.locationUsecase.Get(c.Request().Context(), id, items)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, location)
 }
 
 func (h *LocationHandler) GetLocationList(c echo.Context) error {
@@ -47,7 +65,7 @@ func (h *LocationHandler) GetLocationList(c echo.Context) error {
 type createLocationRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	Image       string `json:"image"`
+	ImageId     int    `json:"imageId"`
 }
 
 func (h *LocationHandler) CreateLocation(c echo.Context) error {
@@ -59,9 +77,8 @@ func (h *LocationHandler) CreateLocation(c echo.Context) error {
 	location := domain.Location{
 		Name:        req.Name,
 		Description: req.Description,
-		//TODO: change to
-		// Image:       req.Image,
-		UserID: user.ID,
+		ImageID:     req.ImageId,
+		UserID:      user.ID,
 	}
 	if err := h.locationUsecase.Create(c.Request().Context(), location); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
@@ -81,4 +98,28 @@ func (h *LocationHandler) DeleteLocation(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 	return c.JSON(http.StatusNoContent, nil)
+}
+
+type updateLocationRequest struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	ImageId     int    `json:"imageId"`
+	LocationId  int    `json:"locationId"`
+}
+
+func (h *LocationHandler) UpdateLocation(c echo.Context) error {
+	var req updateLocationRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	location := domain.Location{
+		Name:        req.Name,
+		Description: req.Description,
+		ImageID:     req.ImageId,
+	}
+	if err := h.locationUsecase.UpdateByID(c.Request().Context(), location, req.LocationId); err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusNoContent, nil)
+
 }

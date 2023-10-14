@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 
@@ -32,6 +33,7 @@ func NewImageHandler(
 	authed := e.Group("/image", handler.middleware.AuthMiddleware)
 	{
 		authed.POST("/upload", handler.UploadImage)
+		authed.DELETE("", handler.DeleteImage)
 
 	}
 	unAuth := e.Group("/image")
@@ -48,17 +50,30 @@ func (h *ImageHandler) UploadImage(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	err = h.imageUsecase.UploadImage(c.Request().Context(), file, user.ID)
+	imgUped, err := h.imageUsecase.UploadImage(c.Request().Context(), file, c.FormValue("hash"), "user", user.ID)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, imgUped)
 }
 
 func (h *ImageHandler) Getbanner(c echo.Context) error {
 	// TODO: Implement Getbanner from database
 	return c.JSON(200, echo.Map{
 		"banner": "/images/banner-onlygf.png",
+	})
+}
+func (h *ImageHandler) DeleteImage(c echo.Context) error {
+	idInt, err := strconv.Atoi(c.QueryParam("id"))
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	err = h.imageUsecase.Delete(c.Request().Context(), idInt)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "Image deleted",
 	})
 }

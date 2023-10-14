@@ -16,8 +16,8 @@ type Blog struct {
 	Title   string `gorm:"type:varchar(255)" json:"title"`
 	Content string `gorm:"type:text" json:"content"`
 
-	ImageID int `json:"-"`
-	Image   Image
+	ImageID int   `json:"-"`
+	Image   Image `json:"image"`
 }
 
 type BlogRepository interface {
