@@ -50,7 +50,19 @@ func (h *ImageHandler) UploadImage(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	imgUped, err := h.imageUsecase.UploadImage(c.Request().Context(), file, c.FormValue("hash"), "user", user.ID)
+	folder := "user"
+	id := user.ID
+	if c.FormValue("folder") != "" {
+		folder = c.FormValue("folder")
+	}
+	if c.FormValue("id") != "" {
+		idInt, err := strconv.Atoi(c.FormValue("id"))
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "Invalid id parameter"})
+		}
+		id = idInt
+	}
+	imgUped, err := h.imageUsecase.UploadImage(c.Request().Context(), file, c.FormValue("hash"), folder, id)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}

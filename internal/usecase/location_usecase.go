@@ -68,6 +68,10 @@ func (u *LocationUsecase) UpdateByID(ctx context.Context, location domain.Locati
 	if err != nil {
 		return err
 	}
+	err = u.locationRepo.UpdateByID(ctx, location, id)
+	if err != nil {
+		return err
+	}
 	if loc.UserID == loc.Image.UserID && location.ImageID != loc.Image.ID {
 		err := u.imageUsecase.Delete(ctx, loc.ImageID)
 		if err != nil {
@@ -75,5 +79,5 @@ func (u *LocationUsecase) UpdateByID(ctx context.Context, location domain.Locati
 		}
 	}
 
-	return u.locationRepo.UpdateByID(ctx, location, id)
+	return nil
 }

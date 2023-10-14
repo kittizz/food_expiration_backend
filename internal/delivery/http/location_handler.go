@@ -120,6 +120,6 @@ func (h *LocationHandler) UpdateLocation(c echo.Context) error {
 	if err := h.locationUsecase.UpdateByID(c.Request().Context(), location, req.LocationId); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
-	return c.JSON(http.StatusNoContent, nil)
+	return c.NoContent(http.StatusOK)
 
 }
