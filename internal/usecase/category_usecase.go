@@ -7,11 +7,10 @@ import (
 )
 
 type CategoryUsecase struct {
-	domain.CategoryUsecase
 	repo domain.CategoryRepository
 }
 
-func NewCategoryUsecase(repo domain.CategoryRepository) *CategoryUsecase {
+func NewCategoryUsecase(repo domain.CategoryRepository) domain.CategoryUsecase {
 	return &CategoryUsecase{
 		repo: repo,
 	}
@@ -31,4 +30,17 @@ func (uc *CategoryUsecase) Delete(ctx context.Context, category domain.Category)
 
 func (uc *CategoryUsecase) Update(ctx context.Context, category domain.Category, id int) error {
 	return uc.repo.Update(ctx, category, id)
+}
+
+func (uc *CategoryUsecase) List(ctx context.Context) ([]string, error) {
+	categorys, err := uc.repo.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var names []string
+	for _, category := range categorys {
+		names = append(names, category.Name)
+	}
+	return names, nil
 }

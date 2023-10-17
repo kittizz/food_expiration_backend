@@ -8,11 +8,10 @@ import (
 )
 
 type CategoryRepository struct {
-	domain.CategoryRepository
 	db *database.DatabaseMySQL
 }
 
-func NewCategoryRepository(db *database.DatabaseMySQL) *CategoryRepository {
+func NewCategoryRepository(db *database.DatabaseMySQL) domain.CategoryRepository {
 	return &CategoryRepository{
 		db: db,
 	}
@@ -41,4 +40,11 @@ func (repo *CategoryRepository) Update(ctx context.Context, category domain.Cate
 	return repo.db.
 		Where(domain.Category{ID: id}).
 		Update("name", category.Name).Error
+}
+func (repo *CategoryRepository) List(ctx context.Context) ([]*domain.Category, error) {
+	var categories []*domain.Category
+	if err := repo.db.Find(&categories).Error; err != nil {
+		return nil, err
+	}
+	return categories, nil
 }
