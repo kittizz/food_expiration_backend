@@ -8,16 +8,16 @@ import (
 	"github.com/kittizz/food_expiration_backend/internal/pkg/server"
 )
 
-type LocationItemHandler struct {
+type ItemHandler struct {
 	middleware *http_middleware.HttpMiddleware
 
-	locationItemUsecase domain.LocationItemUsecase
+	itemUsecase domain.ItemUsecase
 }
 
-func NewLocationItemHandler(e *server.EchoServer, middleware *http_middleware.HttpMiddleware, locationItemUsecase domain.LocationItemUsecase) *LocationItemHandler {
-	h := &LocationItemHandler{
-		middleware:          middleware,
-		locationItemUsecase: locationItemUsecase,
+func NewItemHandler(e *server.EchoServer, middleware *http_middleware.HttpMiddleware, itemUsecase domain.ItemUsecase) *ItemHandler {
+	h := &ItemHandler{
+		middleware:  middleware,
+		itemUsecase: itemUsecase,
 	}
 
 	group := e.Group("/item/:ID", h.middleware.AuthMiddleware)
@@ -27,7 +27,7 @@ func NewLocationItemHandler(e *server.EchoServer, middleware *http_middleware.Ht
 	return h
 }
 
-type createLocationItemRequest struct {
+type createItemRequest struct {
 	Id          int       `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`

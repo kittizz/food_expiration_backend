@@ -21,11 +21,12 @@ func main() {
 	if err := instance.AutoMigrate(
 		&domain.User{},
 		&domain.Location{},
-		&domain.Location{},
+		&domain.Item{},
 		&domain.ThumbnailCategory{},
 		&domain.Thumbnail{},
 		&domain.Blog{},
 		&domain.Image{},
+		&domain.Category{},
 	); err != nil {
 		panic(err)
 

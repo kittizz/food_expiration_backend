@@ -52,6 +52,8 @@ func Run(firebaseCredentials []byte) {
 			repository.NewImageRepository,
 			repository.NewThumbnailCategoryRepository,
 			repository.NewThumbnailRepository,
+			repository.NewItemRepository,
+			repository.NewCategoryRepository,
 
 			auth.NewFirebase(firebaseCredentials),
 			bucket.NewBucket,
@@ -63,6 +65,8 @@ func Run(firebaseCredentials []byte) {
 			usecase.NewImageUsecase,
 			usecase.NewThumbnailCategoryUsecase,
 			usecase.NewThumbnail,
+			usecase.NewItemUsecase,
+			usecase.NewCategoryUsecase,
 
 			http_middleware.NewHttpMiddleware,
 
@@ -71,9 +75,11 @@ func Run(firebaseCredentials []byte) {
 			http.NewLocationHandler,
 			http.NewImageHandler,
 			http.NewThumbnailHandler,
+			http.NewItemHandler,
+			http.NewCategoryHandler,
 		),
 
-		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler, *http.ImageHandler, *http.ThumbnailHandler) {
+		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler, *http.ImageHandler, *http.ThumbnailHandler, *http.ItemHandler, *http.CategoryHandler) {
 		}),
 	)
 

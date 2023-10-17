@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type LocationItem struct {
+type Item struct {
 	ID        int            `gorm:"primarykey" json:"id"`
 	CreatedAt time.Time      `json:"-"`
 	UpdatedAt time.Time      `json:"-"`
@@ -29,16 +29,16 @@ type LocationItem struct {
 	Image      Image `json:"image"`
 }
 
-type LocationItemRepository interface {
-	Create(ctx context.Context, locationItem LocationItem) error
-	Get(ctx context.Context, id int) (*LocationItem, error)
-	Delete(ctx context.Context, locationItem LocationItem) error
-	UpdateByID(ctx context.Context, locationItem LocationItem, id int) error
+type ItemRepository interface {
+	Create(ctx context.Context, item Item) error
+	Get(ctx context.Context, id int) (*Item, error)
+	Delete(ctx context.Context, item Item) error
+	UpdateByID(ctx context.Context, item Item, id int) error
 }
 
-type LocationItemUsecase interface {
-	Create(ctx context.Context, locationItem LocationItem) error
-	Get(ctx context.Context, id int) (*LocationItem, error)
-	Delete(ctx context.Context, locationItem LocationItem) error
-	UpdateByID(ctx context.Context, locationItem LocationItem, id int) error
+type ItemUsecase interface {
+	Create(ctx context.Context, item Item) error
+	Get(ctx context.Context, id int) (*Item, error)
+	Delete(ctx context.Context, item Item) error
+	UpdateByID(ctx context.Context, item Item, id int) error
 }
