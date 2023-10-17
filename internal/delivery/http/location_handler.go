@@ -26,11 +26,12 @@ func NewLocationHandler(e *server.EchoServer, middleware *http_middleware.HttpMi
 
 	group := e.Group("/location", h.middleware.AuthMiddleware)
 	{
+
 		group.GET("", h.GetLocation)
 		group.GET("/list", h.GetLocationList)
 		group.POST("", h.CreateLocation)
 		group.DELETE("", h.DeleteLocation)
-		group.PATCH("", h.UpdateLocation)
+		group.PUT("", h.UpdateLocation)
 	}
 	return h
 }

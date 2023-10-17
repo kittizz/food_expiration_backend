@@ -19,8 +19,8 @@ type Location struct {
 	ImageID int   `json:"-"`
 	Image   Image `json:"image"`
 
-	UserID        int            `gorm:"uniqueIndex:idx_name_user_id" json:"-"`
-	LocationItems []LocationItem `json:"locationItems,omitempty"`
+	UserID    int        `gorm:"uniqueIndex:idx_name_user_id" json:"-"`
+	Locations []Location `json:"locations,omitempty"`
 }
 
 type LocationRepository interface {

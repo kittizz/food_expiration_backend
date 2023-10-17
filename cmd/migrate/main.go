@@ -21,7 +21,7 @@ func main() {
 	if err := instance.AutoMigrate(
 		&domain.User{},
 		&domain.Location{},
-		&domain.LocationItem{},
+		&domain.Location{},
 		&domain.ThumbnailCategory{},
 		&domain.Thumbnail{},
 		&domain.Blog{},

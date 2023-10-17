@@ -39,7 +39,7 @@ func (u *LocationUsecase) Delete(ctx context.Context, location domain.Location) 
 	}
 
 	wg := sync.WaitGroup{}
-	for _, item := range loc.LocationItems {
+	for _, item := range loc.Locations {
 		if loc.UserID == item.Image.UserID {
 			wg.Add(1)
 			go func(imageID int) {
