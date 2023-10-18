@@ -26,8 +26,8 @@ func (repo *LocationRepository) Get(ctx context.Context, id int, items bool) (*d
 
 	if items {
 		q.
-			Preload("Locations").
-			Preload("Locations.Image")
+			Preload("Items").
+			Preload("Items.Image")
 	}
 	err := q.
 		Joins("Image").
