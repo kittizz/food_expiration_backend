@@ -32,6 +32,7 @@ type Item struct {
 type ItemRepository interface {
 	Create(ctx context.Context, item Item) error
 	Get(ctx context.Context, id int) (*Item, error)
+	List(ctx context.Context, locationId *int, isArchived bool) ([]*Item, error)
 	Delete(ctx context.Context, item Item) error
 	UpdateByID(ctx context.Context, item Item, id int) error
 }
@@ -39,6 +40,7 @@ type ItemRepository interface {
 type ItemUsecase interface {
 	Create(ctx context.Context, item Item) error
 	Get(ctx context.Context, id int) (*Item, error)
+	List(ctx context.Context, locationId *int, isArchived bool) ([]*Item, error)
 	Delete(ctx context.Context, item Item) error
 	UpdateByID(ctx context.Context, item Item, id int) error
 }

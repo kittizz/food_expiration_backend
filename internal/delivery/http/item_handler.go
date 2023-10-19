@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -27,6 +28,8 @@ func NewItemHandler(e *server.EchoServer, middleware *http_middleware.HttpMiddle
 	group := e.Group("/item", h.middleware.AuthMiddleware)
 	{
 		group.POST("/create", h.CreateItem)
+		group.GET("/location", h.GetLocationItemAll)
+		group.GET("/location/:id", h.GetLocationItem)
 
 	}
 	return h
@@ -69,4 +72,33 @@ func (h *ItemHandler) CreateItem(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 	return c.NoContent(http.StatusCreated)
+}
+func (h *ItemHandler) GetLocationItem(c echo.Context) error {
+	idInt, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	isArchivedBool, err := strconv.ParseBool(c.QueryParam("isArchived"))
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	item, err := h.itemUsecase.List(c.Request().Context(), &idInt, isArchivedBool)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, item)
+}
+func (h *ItemHandler) GetLocationItemAll(c echo.Context) error {
+	isArchivedBool, err := strconv.ParseBool(c.QueryParam("isArchived"))
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	items, err := h.itemUsecase.List(c.Request().Context(), nil, isArchivedBool)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, items)
 }

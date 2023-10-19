@@ -27,7 +27,7 @@ func NewEchoServer(lc fx.Lifecycle) *EchoServer {
 		Logger: elog,
 	}))
 	e.Use(middleware.Recover())
-	e.Use(middleware.AddTrailingSlash())
+	e.Pre(middleware.RemoveTrailingSlash())
 
 	lc.Append(fx.Hook{
 		OnStart: func(context.Context) error {

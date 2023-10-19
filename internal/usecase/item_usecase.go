@@ -34,3 +34,7 @@ func (u *ItemUsecase) UpdateByID(ctx context.Context, item domain.Item, id int) 
 
 	return u.itemRepo.UpdateByID(ctx, item, id)
 }
+
+func (u *ItemUsecase) List(ctx context.Context, locationId *int, isArchived bool) ([]*domain.Item, error) {
+	return u.itemRepo.List(ctx, locationId, isArchived)
+}
