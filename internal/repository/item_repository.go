@@ -43,8 +43,8 @@ func (repo *ItemRepository) UpdateByID(ctx context.Context, item domain.Item, id
 
 func (repo *ItemRepository) List(ctx context.Context, locationId *int, isArchived bool) ([]*domain.Item, error) {
 	var result []*domain.Item
-	q := repo.db.WithContext(ctx).
-		Where(domain.Item{IsArchived: isArchived})
+	q := repo.db.WithContext(ctx).Model(domain.Item{}).
+		Where("is_archived = ?", isArchived)
 	if locationId != nil {
 		q = q.
 			Where(domain.Item{LocationID: *locationId})
@@ -54,4 +54,10 @@ func (repo *ItemRepository) List(ctx context.Context, locationId *int, isArchive
 		Find(&result).Error
 
 	return result, err
+}
+func (repo *ItemRepository) Archive(ctx context.Context, archive bool, id []int) error {
+	return repo.db.WithContext(ctx).
+		Model(&domain.Item{}).
+		Where("id IN ?", id).
+		Update("is_archived", archive).Error
 }

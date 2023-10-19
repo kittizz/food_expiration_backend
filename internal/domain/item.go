@@ -20,13 +20,14 @@ type Item struct {
 	ExpireDate  time.Time `json:"expireDate"`
 
 	ForewarnDay int    `gorm:"type:int" json:"forewarnDay"`
-	IsArchived  bool   `gorm:"type:boolean" json:"isArchived"`
+	IsArchived  bool   `json:"isArchived"`
 	Category    string `gorm:"type:varchar(255)" json:"category"`
 	Barcode     string `gorm:"type:varchar(255)" json:"barcode"`
-
-	LocationID int   `json:"-"`
-	ImageID    int   `json:"-"`
-	Image      Image `json:"image"`
+	Quantity    int    ` json:"quantity"`
+	Unit        string `json:"unit"`
+	LocationID  int    `json:"locationId"`
+	ImageID     int    `json:"-"`
+	Image       Image  `json:"image"`
 }
 
 type ItemRepository interface {
@@ -35,12 +36,14 @@ type ItemRepository interface {
 	List(ctx context.Context, locationId *int, isArchived bool) ([]*Item, error)
 	Delete(ctx context.Context, item Item) error
 	UpdateByID(ctx context.Context, item Item, id int) error
+	Archive(ctx context.Context, archive bool, id []int) error
 }
 
 type ItemUsecase interface {
 	Create(ctx context.Context, item Item) error
 	Get(ctx context.Context, id int) (*Item, error)
-	List(ctx context.Context, locationId *int, isArchived bool) ([]*Item, error)
+	List(ctx context.Context, locationId *int, isArchived bool, sort bool) ([]*Item, error)
 	Delete(ctx context.Context, item Item) error
 	UpdateByID(ctx context.Context, item Item, id int) error
+	Archive(ctx context.Context, archive bool, id []int) error
 }

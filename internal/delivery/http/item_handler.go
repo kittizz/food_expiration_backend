@@ -30,6 +30,7 @@ func NewItemHandler(e *server.EchoServer, middleware *http_middleware.HttpMiddle
 		group.POST("/create", h.CreateItem)
 		group.GET("/location", h.GetLocationItemAll)
 		group.GET("/location/:id", h.GetLocationItem)
+		group.PUT("/clear", h.ClearItem)
 
 	}
 	return h
@@ -44,6 +45,9 @@ type createItemRequest struct {
 	IsArchived  bool      `json:"isArchived"`
 	Category    string    `json:"category"`
 	Barcode     string    `json:"barcode"`
+
+	Quantity int    `json:"quantity"`
+	Unit     string `json:"unit"`
 
 	ImageId    int `json:"imageId"`
 	LocationId int `json:"locationId"`
@@ -64,6 +68,8 @@ func (h *ItemHandler) CreateItem(c echo.Context) error {
 		IsArchived:  req.IsArchived,
 		Category:    req.Category,
 		Barcode:     req.Barcode,
+		Quantity:    req.Quantity,
+		Unit:        req.Unit,
 
 		ImageID:    req.ImageId,
 		LocationID: req.LocationId,
@@ -74,9 +80,16 @@ func (h *ItemHandler) CreateItem(c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 func (h *ItemHandler) GetLocationItem(c echo.Context) error {
+	var id *int
 	idInt, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	if idInt <= 0 {
+		id = nil
+	} else {
+		id = &idInt
 	}
 
 	isArchivedBool, err := strconv.ParseBool(c.QueryParam("isArchived"))
@@ -84,7 +97,7 @@ func (h *ItemHandler) GetLocationItem(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 
-	item, err := h.itemUsecase.List(c.Request().Context(), &idInt, isArchivedBool)
+	item, err := h.itemUsecase.List(c.Request().Context(), id, isArchivedBool, true)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
@@ -96,9 +109,27 @@ func (h *ItemHandler) GetLocationItemAll(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 
-	items, err := h.itemUsecase.List(c.Request().Context(), nil, isArchivedBool)
+	items, err := h.itemUsecase.List(c.Request().Context(), nil, isArchivedBool, true)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 	return c.JSON(http.StatusOK, items)
+}
+
+type clearItemRequest struct {
+	Id      []int `json:"id"`
+	Archive bool  `json:"archive"`
+}
+
+func (h *ItemHandler) ClearItem(c echo.Context) error {
+
+	var req clearItemRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	err := h.itemUsecase.Archive(c.Request().Context(), req.Archive, req.Id)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	return c.NoContent(http.StatusOK)
 }

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"sort"
 
 	"github.com/kittizz/food_expiration_backend/internal/domain"
 )
@@ -35,6 +36,22 @@ func (u *ItemUsecase) UpdateByID(ctx context.Context, item domain.Item, id int) 
 	return u.itemRepo.UpdateByID(ctx, item, id)
 }
 
-func (u *ItemUsecase) List(ctx context.Context, locationId *int, isArchived bool) ([]*domain.Item, error) {
-	return u.itemRepo.List(ctx, locationId, isArchived)
+func (u *ItemUsecase) List(ctx context.Context, locationId *int, isArchived bool, isSort bool) ([]*domain.Item, error) {
+
+	items, err := u.itemRepo.List(ctx, locationId, isArchived)
+	if err != nil {
+		return nil, err
+	}
+	if isSort {
+		sort.SliceStable(items, func(i, j int) bool {
+			return items[i].ExpireDate.AddDate(0, 0, -items[i].ForewarnDay).Before(items[j].ExpireDate.AddDate(0, 0, -items[j].ForewarnDay))
+		})
+	}
+	return items, nil
+
+}
+
+func (u *ItemUsecase) Archive(ctx context.Context, archive bool, id []int) error {
+
+	return u.itemRepo.Archive(ctx, archive, id)
 }
