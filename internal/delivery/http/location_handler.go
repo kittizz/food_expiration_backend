@@ -76,8 +76,8 @@ func (h *LocationHandler) CreateLocation(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 	location := domain.Location{
-		Name:        req.Name,
-		Description: req.Description,
+		Name:        &req.Name,
+		Description: &req.Description,
 		ImageID:     req.ImageId,
 		UserID:      user.ID,
 	}
@@ -114,8 +114,8 @@ func (h *LocationHandler) UpdateLocation(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 	location := domain.Location{
-		Name:        req.Name,
-		Description: req.Description,
+		Name:        &req.Name,
+		Description: &req.Description,
 		ImageID:     req.ImageId,
 	}
 	if err := h.locationUsecase.UpdateByID(c.Request().Context(), location, req.LocationId); err != nil {

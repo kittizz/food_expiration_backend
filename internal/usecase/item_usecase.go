@@ -44,7 +44,7 @@ func (u *ItemUsecase) List(ctx context.Context, locationId *int, isArchived bool
 	}
 	if isSort {
 		sort.SliceStable(items, func(i, j int) bool {
-			return items[i].ExpireDate.AddDate(0, 0, -items[i].ForewarnDay).Before(items[j].ExpireDate.AddDate(0, 0, -items[j].ForewarnDay))
+			return items[i].ExpireDate.AddDate(0, 0, -*items[i].ForewarnDay).Before(items[j].ExpireDate.AddDate(0, 0, -*items[j].ForewarnDay))
 		})
 	}
 	return items, nil

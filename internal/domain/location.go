@@ -13,8 +13,8 @@ type Location struct {
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Name        string `gorm:"type:varchar(64);uniqueIndex:idx_name_user_id" json:"name"`
-	Description string `gorm:"type:varchar(255)" json:"description"`
+	Name        *string `gorm:"type:varchar(64);uniqueIndex:idx_name_user_id" json:"name"`
+	Description *string `gorm:"type:varchar(255)" json:"description"`
 
 	ImageID int   `json:"-"`
 	Image   Image `json:"image"`
