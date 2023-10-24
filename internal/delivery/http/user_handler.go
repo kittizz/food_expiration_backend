@@ -41,6 +41,7 @@ func NewUserHandler(
 		authed.GET("", handler.GetUser)
 		authed.POST("/change-profilepicture", handler.ChangeProfilePicture)
 		authed.POST("/change-nickname", handler.ChangeNickname)
+		authed.POST("/update-fcm", handler.UpdateFcm)
 
 	}
 	e.GET("/test_token", handler.TestToken)
@@ -136,6 +137,26 @@ func (h *UserHandler) ChangeNickname(c echo.Context) error {
 
 	user := request.UserFrom(c)
 	err := h.userUsecase.ChangeNickname(c.Request().Context(), req.Nickname, user.ID)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+type updateFcmRequest struct {
+	FcmToken   *string `json:"fcmToken"`
+	DeviceType *string `json:"deviceType"`
+}
+
+func (h *UserHandler) UpdateFcm(c echo.Context) error {
+	var req updateFcmRequest
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := request.UserFrom(c)
+	err := h.userUsecase.UpdateFcm(c.Request().Context(), req.FcmToken, req.DeviceType, user.ID)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}

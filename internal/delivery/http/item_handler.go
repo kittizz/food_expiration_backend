@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -30,8 +29,7 @@ func NewItemHandler(e *server.EchoServer, middleware *http_middleware.HttpMiddle
 	{
 		group.GET("/:id", h.GetItem)
 		group.POST("/create", h.CreateItem)
-		group.GET("/location", h.GetLocationItemAll)
-		group.GET("/location/:id", h.GetLocationItem)
+		group.POST("/location", h.GetLocationItemAll)
 		group.PUT("/clear", h.ClearItem)
 		group.PUT("/:id", h.UpdateItem)
 
@@ -75,6 +73,7 @@ func (h *ItemHandler) CreateItem(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 
+	user := request.UserFrom(c)
 	err := h.itemUsecase.Create(c.Request().Context(), domain.Item{
 		Name:        &req.Name,
 		Description: &req.Description,
@@ -89,6 +88,7 @@ func (h *ItemHandler) CreateItem(c echo.Context) error {
 
 		ImageID:    req.ImageId,
 		LocationID: req.LocationId,
+		UserID:     user.ID,
 	})
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
@@ -119,7 +119,7 @@ func (h *ItemHandler) UpdateItem(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
-	fmt.Println(req.StorageDate)
+	user := request.UserFrom(c)
 	err := h.itemUsecase.UpdateByID(c.Request().Context(), domain.Item{
 		Name:        &req.Name,
 		Description: &req.Description,
@@ -134,6 +134,7 @@ func (h *ItemHandler) UpdateItem(c echo.Context) error {
 
 		ImageID:    req.ImageId,
 		LocationID: req.LocationId,
+		UserID:     user.ID,
 	}, req.Id)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
@@ -141,37 +142,19 @@ func (h *ItemHandler) UpdateItem(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h *ItemHandler) GetLocationItem(c echo.Context) error {
-	var id *int
-	idInt, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
-	}
-
-	if idInt <= 0 {
-		id = nil
-	} else {
-		id = &idInt
-	}
-
-	isArchivedBool, err := strconv.ParseBool(c.QueryParam("isArchived"))
-	if err != nil {
-		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
-	}
-
-	item, err := h.itemUsecase.List(c.Request().Context(), id, isArchivedBool, true)
-	if err != nil {
-		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
-	}
-	return c.JSON(http.StatusOK, item)
+type locationItemAll struct {
+	Id         int  `json:"id"`
+	IsArchived bool `json:"isArchived"`
 }
+
 func (h *ItemHandler) GetLocationItemAll(c echo.Context) error {
-	isArchivedBool, err := strconv.ParseBool(c.QueryParam("isArchived"))
-	if err != nil {
+	var req locationItemAll
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
+	user := request.UserFrom(c)
 
-	items, err := h.itemUsecase.List(c.Request().Context(), nil, isArchivedBool, true)
+	items, err := h.itemUsecase.List(c.Request().Context(), user.ID, req.Id, req.IsArchived, true)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}

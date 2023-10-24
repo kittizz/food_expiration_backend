@@ -54,9 +54,7 @@ func (h *LocationHandler) GetLocation(c echo.Context) error {
 
 func (h *LocationHandler) GetLocationList(c echo.Context) error {
 	user := request.UserFrom(c)
-	locations, err := h.locationUsecase.List(c.Request().Context(), domain.Location{
-		UserID: user.ID,
-	})
+	locations, err := h.locationUsecase.List(c.Request().Context(), user.ID)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}

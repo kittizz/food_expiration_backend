@@ -28,12 +28,15 @@ type Item struct {
 	LocationID  int     `json:"locationId"`
 	ImageID     int     `json:"-"`
 	Image       Image   `json:"image"`
+
+	UserID int  `json:"userId"`
+	User   User `json:"-"`
 }
 
 type ItemRepository interface {
 	Create(ctx context.Context, item Item) error
 	Get(ctx context.Context, id int) (*Item, error)
-	List(ctx context.Context, locationId *int, isArchived bool) ([]*Item, error)
+	List(ctx context.Context, userId int, locationId int, isArchived bool) ([]*Item, error)
 	Delete(ctx context.Context, item Item) error
 	UpdateByID(ctx context.Context, item Item, id int) error
 	Archive(ctx context.Context, archive bool, id []int) error
@@ -42,7 +45,7 @@ type ItemRepository interface {
 type ItemUsecase interface {
 	Create(ctx context.Context, item Item) error
 	Get(ctx context.Context, id int) (*Item, error)
-	List(ctx context.Context, locationId *int, isArchived bool, sort bool) ([]*Item, error)
+	List(ctx context.Context, userId int, locationId int, isArchived bool, sort bool) ([]*Item, error)
 	Delete(ctx context.Context, item Item) error
 	UpdateByID(ctx context.Context, item Item, id int) error
 	Archive(ctx context.Context, archive bool, id []int) error

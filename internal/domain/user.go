@@ -27,6 +27,9 @@ type User struct {
 	ProfilePicture         *string `gorm:"type:varchar(255)" json:"profilePicture"`
 	ProfilePictureBlurHash *string `gorm:"type:varchar(30)" json:"profilePictureBlurHash"`
 
+	FcmToken   *string `gorm:"type:varchar(255)" json:"-"`
+	DeviceType *string `gorm:"type:varchar(32)" json:"-"`
+
 	Locations []Location `json:"-"`
 }
 
@@ -39,6 +42,7 @@ type UserUsecase interface {
 	GetUserByDeviceId(ctx context.Context, deviceId string) (*User, error)
 	ChangeProfile(ctx context.Context, file *multipart.FileHeader, hash string, userId int) error
 	ChangeNickname(ctx context.Context, nickname string, userId int) error
+	UpdateFcm(ctx context.Context, fcmToken *string, deviceType *string, userId int) error
 }
 
 type UserRepository interface {

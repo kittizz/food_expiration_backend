@@ -41,14 +41,12 @@ func (repo *ItemRepository) UpdateByID(ctx context.Context, item domain.Item, id
 		Updates(item).Error
 }
 
-func (repo *ItemRepository) List(ctx context.Context, locationId *int, isArchived bool) ([]*domain.Item, error) {
+func (repo *ItemRepository) List(ctx context.Context, userId int, locationId int, isArchived bool) ([]*domain.Item, error) {
 	var result []*domain.Item
 	q := repo.db.WithContext(ctx).Model(domain.Item{}).
-		Where("is_archived = ?", isArchived)
-	if locationId != nil {
-		q = q.
-			Where(domain.Item{LocationID: *locationId})
-	}
+		Where("is_archived = ?", isArchived).
+		Where(domain.Item{UserID: userId, LocationID: locationId})
+
 	err := q.
 		Joins("Image").
 		Find(&result).Error

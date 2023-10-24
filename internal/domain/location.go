@@ -26,7 +26,7 @@ type Location struct {
 type LocationRepository interface {
 	Create(ctx context.Context, location Location) error
 	Get(ctx context.Context, id int, items bool) (*Location, error)
-	List(ctx context.Context, location Location) ([]*Location, error)
+	List(ctx context.Context, userId int) ([]*Location, error)
 	Delete(ctx context.Context, location Location) error
 	UpdateByID(ctx context.Context, location Location, id int) error
 }
@@ -34,7 +34,7 @@ type LocationRepository interface {
 type LocationUsecase interface {
 	Create(ctx context.Context, location Location) error
 	Get(ctx context.Context, id int, items bool) (*Location, error)
-	List(ctx context.Context, location Location) ([]*Location, error)
+	List(ctx context.Context, userId int) ([]*Location, error)
 	Delete(ctx context.Context, location Location) error
 	UpdateByID(ctx context.Context, location Location, id int) error
 }

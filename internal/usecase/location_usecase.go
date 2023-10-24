@@ -28,8 +28,8 @@ func (u *LocationUsecase) Get(ctx context.Context, id int, items bool) (*domain.
 	return u.locationRepo.Get(ctx, id, items)
 }
 
-func (u *LocationUsecase) List(ctx context.Context, location domain.Location) ([]*domain.Location, error) {
-	return u.locationRepo.List(ctx, location)
+func (u *LocationUsecase) List(ctx context.Context, userId int) ([]*domain.Location, error) {
+	return u.locationRepo.List(ctx, userId)
 }
 
 func (u *LocationUsecase) Delete(ctx context.Context, location domain.Location) error {

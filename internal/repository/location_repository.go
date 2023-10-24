@@ -36,10 +36,10 @@ func (repo *LocationRepository) Get(ctx context.Context, id int, items bool) (*d
 	return &result, err
 }
 
-func (repo *LocationRepository) List(ctx context.Context, query domain.Location) ([]*domain.Location, error) {
+func (repo *LocationRepository) List(ctx context.Context, userId int) ([]*domain.Location, error) {
 	var result []*domain.Location
 	err := repo.db.WithContext(ctx).
-		Where(domain.Location{ID: query.ID, UserID: query.UserID}).
+		Where(domain.Location{UserID: userId}).
 		Order("id DESC").
 		Joins("Image").
 		Find(&result).Error

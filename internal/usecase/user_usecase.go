@@ -162,3 +162,11 @@ func (u *UserUsecase) ChangeNickname(ctx context.Context, nickname string, userI
 	}
 	return nil
 }
+
+func (u *UserUsecase) UpdateFcm(ctx context.Context, fcmToken *string, deviceType *string, userId int) error {
+	err := u.userRepo.UpdateByID(ctx, userId, domain.User{FcmToken: fcmToken, DeviceType: deviceType})
+	if err != nil {
+		return err
+	}
+	return nil
+}
