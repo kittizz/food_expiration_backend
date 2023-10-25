@@ -12,9 +12,9 @@ import (
 
 	"github.com/kittizz/food_expiration_backend/internal/delivery/http"
 	http_middleware "github.com/kittizz/food_expiration_backend/internal/delivery/http/middleware"
-	"github.com/kittizz/food_expiration_backend/internal/pkg/auth"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/bucket"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/database"
+	"github.com/kittizz/food_expiration_backend/internal/pkg/firebase"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/server"
 	"github.com/kittizz/food_expiration_backend/internal/repository"
 	"github.com/kittizz/food_expiration_backend/internal/usecase"
@@ -55,7 +55,7 @@ func Run(firebaseCredentials []byte) {
 			repository.NewItemRepository,
 			repository.NewCategoryRepository,
 
-			auth.NewFirebase(firebaseCredentials),
+			firebase.NewFirebase(firebaseCredentials),
 			bucket.NewBucket,
 			server.NewEchoServer,
 

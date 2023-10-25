@@ -15,20 +15,20 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/kittizz/food_expiration_backend/internal/domain"
-	"github.com/kittizz/food_expiration_backend/internal/pkg/auth"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/bucket"
+	"github.com/kittizz/food_expiration_backend/internal/pkg/firebase"
 )
 
 type UserUsecase struct {
-	auth      *auth.Firebase
+	firebase  *firebase.Firebase
 	userRepo  domain.UserRepository
 	bucket    *bucket.Bucket
 	imageRepo domain.ImageRepository
 }
 
-func NewUserUsecase(auth *auth.Firebase, userRepo domain.UserRepository, bucket *bucket.Bucket, imageRepo domain.ImageRepository) domain.UserUsecase {
+func NewUserUsecase(firebase *firebase.Firebase, userRepo domain.UserRepository, bucket *bucket.Bucket, imageRepo domain.ImageRepository) domain.UserUsecase {
 	return &UserUsecase{
-		auth:      auth,
+		firebase:  firebase,
 		userRepo:  userRepo,
 		bucket:    bucket,
 		imageRepo: imageRepo,
@@ -37,16 +37,16 @@ func NewUserUsecase(auth *auth.Firebase, userRepo domain.UserRepository, bucket 
 
 // GenerateIDToken implements domain.UserUsecase.
 func (u *UserUsecase) GenerateIDToken(ctx context.Context, uid string) (string, error) {
-	return u.auth.CustomToken(ctx, uid)
+	return u.firebase.CustomToken(ctx, uid)
 }
 
 func (u *UserUsecase) VerifyIDToken(ctx context.Context, authorization string) (*domain.User, error) {
 
-	token, err := u.auth.ParseIDToken(authorization)
+	token, err := u.firebase.ParseIDToken(authorization)
 	if err != nil {
 		return nil, err
 	}
-	authToken, err := u.auth.VerifyIDToken(ctx, token)
+	authToken, err := u.firebase.VerifyIDToken(ctx, token)
 	if err != nil {
 
 		if e := log.Debug(); e.Enabled() {
@@ -73,11 +73,11 @@ func (u *UserUsecase) Sync(ctx context.Context, user domain.User) (*domain.User,
 	return _user, err
 }
 func (u *UserUsecase) GetAuthUserByUid(ctx context.Context, uid string) (*domain.User, error) {
-	_uid, err := u.auth.ParseIDToken(uid)
+	_uid, err := u.firebase.ParseIDToken(uid)
 	if err != nil {
 		return nil, err
 	}
-	userRecord, err := u.auth.GetUser(ctx, _uid)
+	userRecord, err := u.firebase.GetUser(ctx, _uid)
 	if err != nil {
 		return nil, err
 	}
