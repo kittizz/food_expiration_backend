@@ -30,6 +30,8 @@ type User struct {
 	FcmToken   *string `gorm:"type:varchar(255)" json:"-"`
 	DeviceType *string `gorm:"type:varchar(32)" json:"-"`
 
+	Notification *bool `json:"notification"`
+
 	Locations []Location `json:"-"`
 }
 
@@ -43,6 +45,7 @@ type UserUsecase interface {
 	ChangeProfile(ctx context.Context, file *multipart.FileHeader, hash string, userId int) error
 	ChangeNickname(ctx context.Context, nickname string, userId int) error
 	UpdateFcm(ctx context.Context, fcmToken *string, deviceType *string, userId int) error
+	UpdateNotification(ctx context.Context, notification *bool, userId int) error
 }
 
 type UserRepository interface {

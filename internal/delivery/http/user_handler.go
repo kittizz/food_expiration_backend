@@ -42,6 +42,7 @@ func NewUserHandler(
 		authed.POST("/change-profilepicture", handler.ChangeProfilePicture)
 		authed.POST("/change-nickname", handler.ChangeNickname)
 		authed.POST("/update-fcm", handler.UpdateFcm)
+		authed.POST("/update-notifications", handler.UpdateNotifications)
 
 	}
 	e.GET("/test_token", handler.TestToken)
@@ -157,6 +158,25 @@ func (h *UserHandler) UpdateFcm(c echo.Context) error {
 
 	user := request.UserFrom(c)
 	err := h.userUsecase.UpdateFcm(c.Request().Context(), req.FcmToken, req.DeviceType, user.ID)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+type updateNotificationsRequest struct {
+	Notifications bool `json:"notifications"`
+}
+
+func (h *UserHandler) UpdateNotifications(c echo.Context) error {
+	var req updateNotificationsRequest
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := request.UserFrom(c)
+	err := h.userUsecase.UpdateNotification(c.Request().Context(), &req.Notifications, user.ID)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}

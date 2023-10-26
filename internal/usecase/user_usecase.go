@@ -170,3 +170,11 @@ func (u *UserUsecase) UpdateFcm(ctx context.Context, fcmToken *string, deviceTyp
 	}
 	return nil
 }
+
+func (u *UserUsecase) UpdateNotification(ctx context.Context, notification *bool, userId int) error {
+	err := u.userRepo.UpdateByID(ctx, userId, domain.User{Notification: notification})
+	if err != nil {
+		return err
+	}
+	return nil
+}
