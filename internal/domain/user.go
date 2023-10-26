@@ -30,7 +30,7 @@ type User struct {
 	FcmToken   *string `gorm:"type:varchar(255)" json:"-"`
 	DeviceType *string `gorm:"type:varchar(32)" json:"-"`
 
-	Notification *bool `json:"notification"`
+	Notification *bool `json:"notification" gorm:"default:true"`
 
 	Locations []Location `json:"-"`
 }
