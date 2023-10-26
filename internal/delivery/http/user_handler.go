@@ -1,13 +1,16 @@
 package http
 
 import (
+	"context"
 	"log"
 	"net/http"
 
+	"firebase.google.com/go/messaging"
 	"github.com/labstack/echo/v4"
 
 	http_middleware "github.com/kittizz/food_expiration_backend/internal/delivery/http/middleware"
 	"github.com/kittizz/food_expiration_backend/internal/domain"
+	"github.com/kittizz/food_expiration_backend/internal/pkg/firebase"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/request"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/server"
 )
@@ -16,6 +19,7 @@ type UserHandler struct {
 	middleware   *http_middleware.HttpMiddleware
 	userUsecase  domain.UserUsecase
 	imageUsecase domain.ImageUsecase
+	firebase     *firebase.Firebase
 }
 
 func NewUserHandler(
@@ -23,12 +27,14 @@ func NewUserHandler(
 	middleware *http_middleware.HttpMiddleware,
 	userUsecase domain.UserUsecase,
 	imageUsecase domain.ImageUsecase,
+	firebase *firebase.Firebase,
 
 ) *UserHandler {
 	handler := &UserHandler{
 		userUsecase:  userUsecase,
 		middleware:   middleware,
 		imageUsecase: imageUsecase,
+		firebase:     firebase,
 	}
 	unAuth := e.Group("/user")
 	{
@@ -46,6 +52,8 @@ func NewUserHandler(
 
 	}
 	e.GET("/test_token", handler.TestToken)
+	e.POST("/test_fcm", handler.TestFcm)
+
 	return handler
 }
 
@@ -181,5 +189,20 @@ func (h *UserHandler) UpdateNotifications(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 
+	return c.NoContent(http.StatusOK)
+}
+func (h *UserHandler) TestFcm(c echo.Context) error {
+	f, err := h.firebase.FcmClient()
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	f.Send(context.Background(), &messaging.Message{
+		Notification: &messaging.Notification{
+			Title: "Congratulations!!",
+			Body:  "You have just implement push notification",
+		},
+		Token: c.FormValue("token"), // it's a single device token
+
+	})
 	return c.NoContent(http.StatusOK)
 }

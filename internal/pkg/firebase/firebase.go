@@ -6,12 +6,14 @@ import (
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
+	"firebase.google.com/go/messaging"
 	"google.golang.org/api/option"
 
 	"github.com/kittizz/food_expiration_backend/internal/domain"
 )
 
 type Firebase struct {
+	*firebase.App
 	*auth.Client
 }
 
@@ -30,7 +32,7 @@ func NewFirebase(firebaseCredentials []byte) func() (*Firebase, error) {
 			return nil, err
 		}
 
-		return &Firebase{auth}, nil
+		return &Firebase{app, auth}, nil
 	}
 }
 
@@ -42,4 +44,12 @@ func (f *Firebase) ParseIDToken(tokenString string) (string, error) {
 		tokenString, "Bearer ",
 	)
 	return token, nil
+}
+
+func (f *Firebase) FcmClient() (*messaging.Client, error) {
+	fcmClient, err := f.Messaging(context.Background())
+	if err != nil {
+		return fcmClient, err
+	}
+	return fcmClient, nil
 }
