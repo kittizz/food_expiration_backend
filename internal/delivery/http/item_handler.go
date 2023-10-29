@@ -32,6 +32,7 @@ func NewItemHandler(e *server.EchoServer, middleware *http_middleware.HttpMiddle
 		group.POST("/location", h.GetLocationItemAll)
 		group.PUT("/clear", h.ClearItem)
 		group.PUT("/:id", h.UpdateItem)
+		group.PATCH("/delete", h.DeleteItem)
 
 	}
 	return h
@@ -173,6 +174,22 @@ func (h *ItemHandler) ClearItem(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 	err := h.itemUsecase.Archive(c.Request().Context(), req.Archive, req.Id)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	return c.NoContent(http.StatusOK)
+}
+
+type deleteItemRequest struct {
+	Id []int `json:"id"`
+}
+
+func (h *ItemHandler) DeleteItem(c echo.Context) error {
+	var req deleteItemRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	err := h.itemUsecase.Deletes(c.Request().Context(), req.Id)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}

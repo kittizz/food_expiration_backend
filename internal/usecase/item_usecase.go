@@ -67,3 +67,7 @@ func (u *ItemUsecase) UpdateNotificationStatus(ctx context.Context, notiMap map[
 	}
 	return nil
 }
+
+func (u *ItemUsecase) Deletes(ctx context.Context, ids []int) error {
+	return u.itemRepo.Deletes(ctx, ids)
+}

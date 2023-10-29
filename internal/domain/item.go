@@ -60,6 +60,7 @@ type ItemRepository interface {
 	List(ctx context.Context, userId int, locationId int, isArchived bool) ([]*Item, error)
 	ListForNotification(ctx context.Context, users []int) ([]*Item, error)
 	Delete(ctx context.Context, item Item) error
+	Deletes(ctx context.Context, ids []int) error
 	UpdateByID(ctx context.Context, item Item, id int) error
 	UpdateNotificationStatus(ctx context.Context, id []int, status NotificationStatus) error
 	Archive(ctx context.Context, archive bool, id []int) error
@@ -71,6 +72,7 @@ type ItemUsecase interface {
 	List(ctx context.Context, userId int, locationId int, isArchived bool, sort bool) ([]*Item, error)
 	ListForNotification(ctx context.Context, users []int) ([]*Item, error)
 	Delete(ctx context.Context, item Item) error
+	Deletes(ctx context.Context, ids []int) error
 	UpdateByID(ctx context.Context, item Item, id int) error
 	Archive(ctx context.Context, archive bool, id []int) error
 	UpdateNotificationStatus(ctx context.Context, notiMap map[NotificationStatus][]int) error

@@ -72,7 +72,7 @@ func (repo *ItemRepository) ListForNotification(ctx context.Context, users []int
 		Where("last_notification_at < CURDATE() or last_notification_at is null")
 
 	err := q.
-		Select("id", "name", "user_id", "forewarn_day", "storage_date", "expire_date", "image_id", "notification_status").
+		Select("id", "name", "user_id", "forewarn_day", "expire_date", "image_id", "notification_status").
 		Find(&result).Error
 
 	return result, err
@@ -86,4 +86,8 @@ func (repo *ItemRepository) UpdateNotificationStatus(ctx context.Context, id []i
 			"last_notification_at": gorm.Expr("CURDATE()"),
 		}).
 		Error
+}
+
+func (repo *ItemRepository) Deletes(ctx context.Context, ids []int) error {
+	return repo.db.WithContext(ctx).Unscoped().Delete(&domain.Item{}, ids).Error
 }
