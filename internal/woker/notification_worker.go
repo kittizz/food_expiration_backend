@@ -187,7 +187,7 @@ func (w *NotificationWorker) run() {
 			if lenEXPIRING > 1 {
 				msg.Notification.Title = "แจ้งเตือนวันหมดอายุ"
 				msg.Notification.Body = "มีรายการกำลังจะหมดอายุในวันนี้ ดูเพิ่มเติม"
-				msg.Notification.ImageURL = "https://th-bkk-1.xvercloud.com/food-expiration/images/logo100x100.png"
+				msg.Notification.ImageURL = "https://th-bkk-1.xvercloud.com/food-expiration/images/logo50.png"
 				message_id, err := send(groupCtx, msg)
 				if err != nil {
 					return err
@@ -212,7 +212,7 @@ func (w *NotificationWorker) run() {
 			if lenFOREWARN > 1 {
 				msg.Notification.Title = "แจ้งเตือนวันหมดอายุล่วงหน้า"
 				msg.Notification.Body = "มีรายการใกล้จะหมดอายุ ดูเพิ่มเติม"
-				msg.Notification.ImageURL = "https://th-bkk-1.xvercloud.com/food-expiration/images/logo100x100.png"
+				msg.Notification.ImageURL = "https://th-bkk-1.xvercloud.com/food-expiration/images/logo50.png"
 				message_id, err := send(groupCtx, msg)
 				if err != nil {
 					return err
