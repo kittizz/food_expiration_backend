@@ -2,8 +2,10 @@ package http
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"firebase.google.com/go/messaging"
 	"github.com/labstack/echo/v4"
@@ -48,11 +50,12 @@ func NewUserHandler(
 		authed.POST("/change-profilepicture", handler.ChangeProfilePicture)
 		authed.POST("/change-nickname", handler.ChangeNickname)
 		authed.POST("/update-fcm", handler.UpdateFcm)
-		authed.POST("/update-notifications", handler.UpdateNotifications)
+		authed.POST("/update-settings", handler.UpdateSettings)
 
 	}
 	e.GET("/test_token", handler.TestToken)
 	e.POST("/test_fcm", handler.TestFcm)
+	e.GET("/test_notification", handler.TestNotification)
 
 	return handler
 }
@@ -173,36 +176,66 @@ func (h *UserHandler) UpdateFcm(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-type updateNotificationsRequest struct {
-	Notifications bool `json:"notifications"`
-}
-
-func (h *UserHandler) UpdateNotifications(c echo.Context) error {
-	var req updateNotificationsRequest
-	if err := c.Bind(&req); err != nil {
-		return err
-	}
-
-	user := request.UserFrom(c)
-	err := h.userUsecase.UpdateNotification(c.Request().Context(), &req.Notifications, user.ID)
-	if err != nil {
-		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
-	}
-
-	return c.NoContent(http.StatusOK)
-}
 func (h *UserHandler) TestFcm(c echo.Context) error {
 	f, err := h.firebase.FcmClient()
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
+	parameterData, _ := json.Marshal(map[string]any{
+		"isLocation": "false",
+		"title":      "รายการทั้งหมด",
+		"locationId": "0",
+		"isScan":     "false",
+		"isSearch":   "false",
+	})
 	f.Send(context.Background(), &messaging.Message{
 		Notification: &messaging.Notification{
 			Title: "Congratulations!!",
 			Body:  "You have just implement push notification",
 		},
 		Token: c.FormValue("token"), // it's a single device token
-
+		Android: &messaging.AndroidConfig{
+			Priority: "high",
+			Notification: &messaging.AndroidNotification{
+				Visibility: messaging.VisibilityPublic,
+			},
+		},
+		Data: map[string]string{
+			"initialPageName": "ItemList",
+			"parameterData":   string(parameterData),
+		},
 	})
 	return c.NoContent(http.StatusOK)
+}
+
+type updateSettingsRequest struct {
+	Notification   bool      `json:"notification"`
+	NotificationAt time.Time `json:"notificationAt"`
+}
+
+func (h *UserHandler) UpdateSettings(c echo.Context) error {
+	var req updateSettingsRequest
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	user := request.UserFrom(c)
+	err := h.userUsecase.UpdateSettings(c.Request().Context(), &req.Notification, req.NotificationAt, user.ID)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (h *UserHandler) TestNotification(c echo.Context) error {
+	notiAt, err := time.Parse(time.TimeOnly, "00:05:00")
+	if err != nil {
+		return err
+	}
+	list, err := h.userUsecase.ListNotifications(c.Request().Context(), notiAt)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, list)
 }

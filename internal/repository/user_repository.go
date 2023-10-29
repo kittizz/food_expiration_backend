@@ -40,3 +40,23 @@ func (repo *UserRepository) UpdateByID(ctx context.Context, id int, user domain.
 		Where("id = ?", id).
 		Updates(user).Error
 }
+func (repo *UserRepository) ListNotifications(ctx context.Context, notiAt int) ([]*domain.User, error) {
+
+	gap := notiAt - 10
+
+	var result []*domain.User
+	q := repo.db.WithContext(ctx).Model(domain.User{}).
+		Select("id", "nickname", "fcm_token").
+		Where("notification = ?", true).
+		Where("fcm_token is not null")
+	if gap < 0 {
+		q = q.Where("notification_at <= ? or notification_at >= ?", notiAt, 1440+gap)
+	} else {
+		q = q.Where("notification_at <= ? or notification_at >= ?", notiAt, gap)
+	}
+
+	err := q.
+		Find(&result).Error
+
+	return result, err
+}

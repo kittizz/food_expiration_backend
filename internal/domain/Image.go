@@ -31,4 +31,5 @@ type ImageUsecase interface {
 	UploadImage(ctx context.Context, file *multipart.FileHeader, hash, folder string, userId int) (img *Image, err error)
 	Delete(ctx context.Context, id int) error
 	DeleteWithPath(ctx context.Context, path string) error
+	Get(ctx context.Context, id int) (*Image, error)
 }

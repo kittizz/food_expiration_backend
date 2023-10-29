@@ -18,6 +18,7 @@ import (
 	"github.com/kittizz/food_expiration_backend/internal/pkg/server"
 	"github.com/kittizz/food_expiration_backend/internal/repository"
 	"github.com/kittizz/food_expiration_backend/internal/usecase"
+	"github.com/kittizz/food_expiration_backend/internal/woker"
 )
 
 func init() {
@@ -77,9 +78,12 @@ func Run(firebaseCredentials []byte) {
 			http.NewThumbnailHandler,
 			http.NewItemHandler,
 			http.NewCategoryHandler,
+
+			woker.NewNotificationWorker,
 		),
 
-		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler, *http.ImageHandler, *http.ThumbnailHandler, *http.ItemHandler, *http.CategoryHandler) {
+		//Lazy invoked
+		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler, *http.ImageHandler, *http.ThumbnailHandler, *http.ItemHandler, *http.CategoryHandler, *woker.NotificationWorker) {
 		}),
 	)
 

@@ -118,3 +118,7 @@ func (u *ImageUsecase) DeleteWithPath(ctx context.Context, path string) error {
 
 	return nil
 }
+
+func (u *ImageUsecase) Get(ctx context.Context, id int) (*domain.Image, error) {
+	return u.imageRepo.Get(ctx, id)
+}

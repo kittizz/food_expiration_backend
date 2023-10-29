@@ -4,11 +4,15 @@ go 1.21
 
 require (
 	firebase.google.com/go v3.13.0+incompatible
-	github.com/google/uuid v1.3.0
+	github.com/alitto/pond v1.8.3
+	github.com/bbrks/go-blurhash v1.1.1
+	github.com/go-co-op/gocron v1.35.2
+	github.com/google/uuid v1.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/minio/minio-go/v7 v7.0.63
 	github.com/rs/zerolog v1.30.0
+	github.com/samber/lo v1.38.1
 	github.com/spf13/viper v1.16.0
 	github.com/ziflex/lecho/v3 v3.5.0
 	go.uber.org/fx v1.20.0
@@ -25,7 +29,6 @@ require (
 	cloud.google.com/go/iam v0.13.0 // indirect
 	cloud.google.com/go/longrunning v0.4.1 // indirect
 	cloud.google.com/go/storage v1.28.1 // indirect
-	github.com/bbrks/go-blurhash v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
@@ -52,6 +55,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
@@ -68,6 +72,7 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect

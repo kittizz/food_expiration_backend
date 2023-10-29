@@ -7,6 +7,7 @@ import (
 	"io"
 	"mime/multipart"
 	"path"
+	"time"
 
 	"github.com/bbrks/go-blurhash"
 	"github.com/google/uuid"
@@ -171,10 +172,22 @@ func (u *UserUsecase) UpdateFcm(ctx context.Context, fcmToken *string, deviceTyp
 	return nil
 }
 
-func (u *UserUsecase) UpdateNotification(ctx context.Context, notification *bool, userId int) error {
-	err := u.userRepo.UpdateByID(ctx, userId, domain.User{Notification: notification})
+func (u *UserUsecase) UpdateSettings(ctx context.Context, notification *bool, notificationsAt time.Time, userId int) error {
+	var notiAt domain.NotificationAt
+	err := notiAt.Parse(notificationsAt)
+	if err != nil {
+		return err
+	}
+	err = u.userRepo.UpdateByID(ctx, userId, domain.User{Notification: notification, NotificationAt: &notiAt})
 	if err != nil {
 		return err
 	}
 	return nil
+}
+func (u *UserUsecase) ListNotifications(ctx context.Context, t time.Time) ([]*domain.User, error) {
+	d, err := time.ParseDuration(t.Format("15h4m5s"))
+	if err != nil {
+		return nil, err
+	}
+	return u.userRepo.ListNotifications(ctx, int(d.Minutes()))
 }

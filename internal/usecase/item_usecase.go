@@ -55,3 +55,15 @@ func (u *ItemUsecase) Archive(ctx context.Context, archive bool, id []int) error
 
 	return u.itemRepo.Archive(ctx, archive, id)
 }
+func (u *ItemUsecase) ListForNotification(ctx context.Context, users []int) ([]*domain.Item, error) {
+	return u.itemRepo.ListForNotification(ctx, users)
+}
+func (u *ItemUsecase) UpdateNotificationStatus(ctx context.Context, notiMap map[domain.NotificationStatus][]int) error {
+	for toStatus, ids := range notiMap {
+		err := u.itemRepo.UpdateNotificationStatus(ctx, ids, toStatus)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
