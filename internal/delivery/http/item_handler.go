@@ -73,6 +73,15 @@ func (h *ItemHandler) CreateItem(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
+	if req.ImageId == 0 {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดอัปโหลดรูปหรือเลือกจากคลัง"})
+	}
+	if req.LocationId == 0 {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดเลือกสถานที่"})
+	}
+	if req.Category == "" {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดเลือกสถานที่หมวดหมู่"})
+	}
 
 	user := request.UserFrom(c)
 	err := h.itemUsecase.Create(c.Request().Context(), domain.Item{
@@ -120,6 +129,15 @@ func (h *ItemHandler) UpdateItem(c echo.Context) error {
 	var req updateItemRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	if req.ImageId == 0 {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดอัปโหลดรูปหรือเลือกจากคลัง"})
+	}
+	if req.LocationId == 0 {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดเลือกสถานที่"})
+	}
+	if req.Category == "" {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดเลือกสถานที่หมวดหมู่"})
 	}
 	user := request.UserFrom(c)
 

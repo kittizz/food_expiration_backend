@@ -73,6 +73,14 @@ func (h *LocationHandler) CreateLocation(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
+
+	if req.ImageId == 0 {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดอัปโหลดรูปหรือเลือกจากคลัง"})
+	}
+
+	if req.Name == "" {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดกรอกชื่อสถานที่"})
+	}
 	location := domain.Location{
 		Name:        &req.Name,
 		Description: &req.Description,
@@ -110,6 +118,14 @@ func (h *LocationHandler) UpdateLocation(c echo.Context) error {
 	var req updateLocationRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
+	if req.ImageId == 0 {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดอัปโหลดรูปหรือเลือกจากคลัง"})
+	}
+
+	if req.Name == "" {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดกรอกชื่อสถานที่"})
 	}
 	location := domain.Location{
 		Name:        &req.Name,
