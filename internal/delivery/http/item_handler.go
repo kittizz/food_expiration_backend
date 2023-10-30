@@ -73,6 +73,9 @@ func (h *ItemHandler) CreateItem(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
+	if req.Name == "" {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดกรอกชื่อรายการ"})
+	}
 	if req.ImageId == 0 {
 		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดอัปโหลดรูปหรือเลือกจากคลัง"})
 	}
@@ -129,6 +132,9 @@ func (h *ItemHandler) UpdateItem(c echo.Context) error {
 	var req updateItemRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	if req.Name == "" {
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดกรอกชื่อรายการ"})
 	}
 	if req.ImageId == 0 {
 		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดอัปโหลดรูปหรือเลือกจากคลัง"})
