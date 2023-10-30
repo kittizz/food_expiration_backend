@@ -45,7 +45,7 @@ type Item struct {
 	Quantity           *int               ` json:"quantity"`
 	Unit               *string            `json:"unit"`
 	NotificationStatus NotificationStatus `gorm:"type:enum('PLANNED', 'FOREWARN','EXPIRING', 'DONE');default:'PLANNED';index" json:"notificationStatus"`
-	LastNotificationAt time.Time          `json:"lastNotificationAt"`
+	LastNotificationAt *time.Time         `json:"lastNotificationAt"`
 	LocationID         int                `json:"locationId"`
 	ImageID            int                `json:"-"`
 	Image              Image              `json:"image"`

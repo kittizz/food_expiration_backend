@@ -8,6 +8,7 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: 'toor'
             MYSQL_ROOT_HOST: '%'
+            TZ: Asia/Bangkok
 
         volumes:
             - mysql-data:/var/lib/mysql
@@ -15,6 +16,7 @@ services:
             - mysql-network
         ports:
             - '3306:3306'
+            
 
 networks:
     mysql-network:

@@ -18,13 +18,12 @@ type DatabaseMySQL struct {
 func NewMySQL() (*DatabaseMySQL, error) {
 	instance, err := gorm.Open(
 		mysql.Open(fmt.Sprintf(
-			"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=true&loc=%s",
+			"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=true",
 			viper.GetString("MYSQL_USERNAME"),
 			viper.GetString("MYSQL_PASSWORD"),
 			viper.GetString("MYSQL_HOST"),
 			viper.GetInt("MYSQL_PORT"),
 			viper.GetString("MYSQL_DATABASE"),
-			"Asia%2FBangkok",
 		)),
 		&gorm.Config{
 			Logger: logger.New(

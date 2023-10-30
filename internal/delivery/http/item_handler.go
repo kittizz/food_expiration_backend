@@ -111,8 +111,9 @@ type updateItemRequest struct {
 	Quantity int    `json:"quantity"`
 	Unit     string `json:"unit"`
 
-	ImageId    int `json:"imageId"`
-	LocationId int `json:"locationId"`
+	ImageId           int  `json:"imageId"`
+	LocationId        int  `json:"locationId"`
+	ResetNotification bool `json:"resetNotification"`
 }
 
 func (h *ItemHandler) UpdateItem(c echo.Context) error {
@@ -121,7 +122,8 @@ func (h *ItemHandler) UpdateItem(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 	user := request.UserFrom(c)
-	err := h.itemUsecase.UpdateByID(c.Request().Context(), domain.Item{
+
+	item := domain.Item{
 		Name:        &req.Name,
 		Description: &req.Description,
 		StorageDate: req.StorageDate,
@@ -132,11 +134,16 @@ func (h *ItemHandler) UpdateItem(c echo.Context) error {
 		Barcode:     &req.Barcode,
 		Quantity:    &req.Quantity,
 		Unit:        &req.Unit,
-
-		ImageID:    req.ImageId,
-		LocationID: req.LocationId,
-		UserID:     user.ID,
-	}, req.Id)
+		ImageID:     req.ImageId,
+		LocationID:  req.LocationId,
+		UserID:      user.ID,
+	}
+	if req.ResetNotification {
+		now, _ := time.Parse(time.DateOnly, time.Now().AddDate(0, 0, -1).Format(time.DateOnly))
+		item.LastNotificationAt = &now
+		item.NotificationStatus = domain.NOTIFICATION_STATUS_PLANNED
+	}
+	err := h.itemUsecase.UpdateByID(c.Request().Context(), item, req.Id)
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}

@@ -83,11 +83,7 @@ const (
 func (w *NotificationWorker) run() {
 	log.Info().Msg("Running notification worker")
 	defer log.Info().Msgf("Shutting down notification worker")
-	notiAt, err := time.Parse(time.TimeOnly, "00:05:00")
-	if err != nil {
-		log.Err(err)
-		return
-	}
+	notiAt := time.Now()
 
 	users, err := w.userUsecase.ListNotifications(w.ctx, notiAt)
 	if err != nil {
