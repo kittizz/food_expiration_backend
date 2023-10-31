@@ -1,10 +1,11 @@
 package database
 
 import (
-	"fmt"
 	_log "log"
 	"os"
+	"time"
 
+	gmysql "github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -16,15 +17,23 @@ type DatabaseMySQL struct {
 }
 
 func NewMySQL() (*DatabaseMySQL, error) {
+	loc, err := time.LoadLocation("Asia/Bangkok")
+	if err != nil {
+		return nil, err
+	}
+
+	dsn := gmysql.NewConfig()
+	dsn.User = viper.GetString("MYSQL_USERNAME")
+	dsn.Passwd = viper.GetString("MYSQL_PASSWORD")
+	dsn.Net = "tcp"
+	dsn.Addr = viper.GetString("MYSQL_HOST") + ":" + viper.GetString("MYSQL_PORT")
+	dsn.DBName = viper.GetString("MYSQL_DATABASE")
+	dsn.ParseTime = true
+	dsn.Loc = loc
+	dsn.Collation = "utf8mb4_unicode_ci"
+
 	instance, err := gorm.Open(
-		mysql.Open(fmt.Sprintf(
-			"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=true",
-			viper.GetString("MYSQL_USERNAME"),
-			viper.GetString("MYSQL_PASSWORD"),
-			viper.GetString("MYSQL_HOST"),
-			viper.GetInt("MYSQL_PORT"),
-			viper.GetString("MYSQL_DATABASE"),
-		)),
+		mysql.New(mysql.Config{DSNConfig: dsn}),
 		&gorm.Config{
 			Logger: logger.New(
 				_log.New(os.Stdout, "\n", _log.LstdFlags),

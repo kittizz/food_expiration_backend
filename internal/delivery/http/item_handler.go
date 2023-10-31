@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -133,6 +134,7 @@ func (h *ItemHandler) UpdateItem(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
+	fmt.Println(req)
 	if req.Name == "" {
 		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดกรอกชื่อรายการ"})
 	}
