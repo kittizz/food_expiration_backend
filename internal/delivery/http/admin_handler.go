@@ -23,7 +23,7 @@ func NewAdminHandler(e *server.EchoServer, adminUsecase domain.AdminUsecase, mid
 		categoryUsecase: categoryUsecase,
 		middleware:      middleware,
 	}
-	// TODO: remove this once
+	//TODO: add middleware
 	// adminGroup := e.Group("/admin", h.middleware.AuthMiddleware, h.middleware.AdminMiddleware)
 	adminGroup := e.Group("/admin")
 	{

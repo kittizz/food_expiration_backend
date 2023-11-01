@@ -43,3 +43,11 @@ func (repo *ThumbnailCategoryRepository) Delete(ctx context.Context, thumCategor
 	return repo.db.WithContext(ctx).Unscoped().
 		Delete(&thumCategory).Error
 }
+func (repo *ThumbnailCategoryRepository) Update(ctx context.Context, thumCategory domain.ThumbnailCategory, id int) error {
+	return repo.db.WithContext(ctx).
+		Model(&thumCategory).
+		Where(domain.ThumbnailCategory{
+			ID: id,
+		}).
+		Updates(&thumCategory).Error
+}

@@ -32,3 +32,7 @@ func (u *ThumbnailUsecase) ListByCategoryID(ctx context.Context, id int) ([]*dom
 func (u *ThumbnailUsecase) Delete(ctx context.Context, thum domain.Thumbnail) error {
 	return u.thumbnailRepo.Delete(ctx, thum)
 }
+
+func (u *ThumbnailUsecase) Update(ctx context.Context, thum domain.Thumbnail, id int) error {
+	return u.thumbnailRepo.Update(ctx, thum, id)
+}

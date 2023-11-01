@@ -26,6 +26,7 @@ type ThumbnailRepository interface {
 	GetByCategoryID(ctx context.Context, id int) (*Thumbnail, error)
 	ListByCategoryID(ctx context.Context, id int) ([]*Thumbnail, error)
 	Delete(ctx context.Context, thum Thumbnail) error
+	Update(ctx context.Context, thumCategory Thumbnail, id int) error
 }
 
 type ThumbnailUsecase interface {
@@ -33,4 +34,5 @@ type ThumbnailUsecase interface {
 	GetByCategoryID(ctx context.Context, id int) (*Thumbnail, error)
 	ListByCategoryID(ctx context.Context, id int) ([]*Thumbnail, error)
 	Delete(ctx context.Context, thum Thumbnail) error
+	Update(ctx context.Context, thumCategory Thumbnail, id int) error
 }

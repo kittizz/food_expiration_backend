@@ -38,5 +38,14 @@ func (repo *ThumbnailRepository) ListByCategoryID(ctx context.Context, id int) (
 }
 func (repo *ThumbnailRepository) Delete(ctx context.Context, thum domain.Thumbnail) error {
 	return repo.db.WithContext(ctx).Unscoped().
-		Delete(&thum).Error
+		Where(&thum).
+		Delete(&domain.Thumbnail{}).Error
+}
+func (repo *ThumbnailRepository) Update(ctx context.Context, thum domain.Thumbnail, id int) error {
+	return repo.db.WithContext(ctx).
+		Model(&thum).
+		Where(domain.Thumbnail{
+			ID: id,
+		}).
+		Updates(&thum).Error
 }

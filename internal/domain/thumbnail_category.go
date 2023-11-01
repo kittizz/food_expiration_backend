@@ -28,6 +28,7 @@ type ThumbnailCategoryRepository interface {
 	Get(ctx context.Context, id int) (*ThumbnailCategory, error)
 	List(ctx context.Context) ([]*ThumbnailCategory, error)
 	Delete(ctx context.Context, thumCategory ThumbnailCategory) error
+	Update(ctx context.Context, thumCategory ThumbnailCategory, id int) error
 }
 
 type ThumbnailCategoryUsecase interface {
@@ -35,4 +36,5 @@ type ThumbnailCategoryUsecase interface {
 	Get(ctx context.Context, id int) (*ThumbnailCategory, error)
 	List(ctx context.Context) ([]*ThumbnailCategory, error)
 	Delete(ctx context.Context, thumCategory ThumbnailCategory) error
+	Update(ctx context.Context, thumCategory ThumbnailCategory, id int) error
 }

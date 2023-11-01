@@ -26,14 +26,20 @@ func NewThumbnailHandler(e *server.EchoServer, middleware *http_middleware.HttpM
 		thumbnailUsecase:         thumbnailUsecase,
 	}
 
+	//TODO: add middleware
+
 	group := e.Group("/thumbnail")
 	{
 		group.GET("", h.GetThumbnailByCatrgoryId)
 		group.POST("/create-thumbnail", h.CreateThumbnail)
+		group.DELETE("", h.DeleteThumbnail)
 
 		group.GET("/category", h.GetCategory)
 		group.POST("/create-category", h.CreateCategory)
 		group.DELETE("/category", h.DeleteCategory)
+		group.PUT("/update-category-image", h.UpdateCategoryImage)
+
+		group.POST("/rename", h.Rename)
 	}
 	return h
 }
@@ -98,13 +104,18 @@ func (h *ThumbnailHandler) DeleteCategory(c echo.Context) error {
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
+	err = h.thumbnailUsecase.Delete(c.Request().Context(), domain.Thumbnail{ThumbnailCategoryID: idInt})
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+
 	err = h.thumbnailCategoryUsecase.Delete(c.Request().Context(), domain.ThumbnailCategory{
 		ID: idInt,
 	})
 	if err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
-	return c.JSON(http.StatusNoContent, nil)
+	return c.NoContent(http.StatusNoContent)
 }
 func (h *ThumbnailHandler) GetThumbnailByCatrgoryId(c echo.Context) error {
 	idInt, err := strconv.Atoi(c.QueryParam("catrgoryId"))
@@ -116,4 +127,68 @@ func (h *ThumbnailHandler) GetThumbnailByCatrgoryId(c echo.Context) error {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
 	return c.JSON(http.StatusOK, thumbnail)
+}
+
+type renameRequest struct {
+	Id int `json:"id"`
+
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+func (h *ThumbnailHandler) Rename(c echo.Context) error {
+	var req renameRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	if req.Type == "category" {
+		err := h.thumbnailCategoryUsecase.Update(c.Request().Context(), domain.ThumbnailCategory{
+			Name: req.Name,
+		}, req.Id)
+		if err != nil {
+			return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+		}
+	}
+	if req.Type == "thumbnail" {
+		err := h.thumbnailUsecase.Update(c.Request().Context(), domain.Thumbnail{
+			Name: req.Name,
+		}, req.Id)
+		if err != nil {
+			return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+		}
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
+func (h *ThumbnailHandler) DeleteThumbnail(c echo.Context) error {
+	idInt, err := strconv.Atoi(c.QueryParam("id"))
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	err = h.thumbnailUsecase.Delete(c.Request().Context(), domain.Thumbnail{
+		ID: idInt,
+	})
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
+type updateCategoryImageRequest struct {
+	Id      int `json:"id"`
+	ImageID int `json:"imageId"`
+}
+
+func (h *ThumbnailHandler) UpdateCategoryImage(c echo.Context) error {
+	var req updateCategoryImageRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	err := h.thumbnailCategoryUsecase.Update(c.Request().Context(), domain.ThumbnailCategory{
+		ImageID: req.ImageID,
+	}, req.Id)
+	if err != nil {
+		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
+	}
+	return c.NoContent(http.StatusNoContent)
 }
