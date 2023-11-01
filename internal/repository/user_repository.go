@@ -60,3 +60,9 @@ func (repo *UserRepository) ListNotifications(ctx context.Context, notiAt int) (
 
 	return result, err
 }
+func (repo *UserRepository) Counts(ctx context.Context) (count int64, err error) {
+	err = repo.db.WithContext(ctx).
+		Model(&domain.User{}).
+		Count(&count).Error
+	return
+}

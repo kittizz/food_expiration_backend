@@ -85,6 +85,13 @@ type User struct {
 
 	Locations []Location `json:"-"`
 }
+type UserRepository interface {
+	GetOrCreate(ctx context.Context, user User) (*User, error)
+	Get(ctx context.Context, user User) (*User, error)
+	UpdateByID(ctx context.Context, id int, user User) error
+	ListNotifications(ctx context.Context, notiAt int) ([]*User, error)
+	Counts(ctx context.Context) (int64, error)
+}
 
 type UserUsecase interface {
 	RegisterDevice(ctx context.Context, id int) (string, error)
@@ -98,11 +105,4 @@ type UserUsecase interface {
 	UpdateFcm(ctx context.Context, fcmToken *string, deviceType *string, userId int) error
 	UpdateSettings(ctx context.Context, notification *bool, notificationsAt time.Time, userId int) error
 	ListNotifications(ctx context.Context, notiAt time.Time) ([]*User, error)
-}
-
-type UserRepository interface {
-	GetOrCreate(ctx context.Context, user User) (*User, error)
-	Get(ctx context.Context, user User) (*User, error)
-	UpdateByID(ctx context.Context, id int, user User) error
-	ListNotifications(ctx context.Context, notiAt int) ([]*User, error)
 }

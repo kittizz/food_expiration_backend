@@ -54,3 +54,9 @@ func (repo *LocationRepository) UpdateByID(ctx context.Context, location domain.
 		Where(domain.Location{ID: id}).
 		Updates(location).Error
 }
+func (repo *LocationRepository) Counts(ctx context.Context) (count int64, err error) {
+	err = repo.db.WithContext(ctx).
+		Model(&domain.Location{}).
+		Count(&count).Error
+	return
+}

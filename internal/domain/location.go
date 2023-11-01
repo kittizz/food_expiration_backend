@@ -29,6 +29,7 @@ type LocationRepository interface {
 	List(ctx context.Context, userId int) ([]*Location, error)
 	Delete(ctx context.Context, location Location) error
 	UpdateByID(ctx context.Context, location Location, id int) error
+	Counts(ctx context.Context) (int64, error)
 }
 
 type LocationUsecase interface {

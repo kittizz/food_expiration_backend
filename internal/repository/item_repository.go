@@ -91,3 +91,9 @@ func (repo *ItemRepository) UpdateNotificationStatus(ctx context.Context, id []i
 func (repo *ItemRepository) Deletes(ctx context.Context, ids []int) error {
 	return repo.db.WithContext(ctx).Unscoped().Delete(&domain.Item{}, ids).Error
 }
+func (repo *ItemRepository) Counts(ctx context.Context) (count int64, err error) {
+	err = repo.db.WithContext(ctx).
+		Model(&domain.Item{}).
+		Count(&count).Error
+	return
+}

@@ -64,6 +64,7 @@ type ItemRepository interface {
 	UpdateByID(ctx context.Context, item Item, id int) error
 	UpdateNotificationStatus(ctx context.Context, id []int, status NotificationStatus) error
 	Archive(ctx context.Context, archive bool, id []int) error
+	Counts(ctx context.Context) (int64, error)
 }
 
 type ItemUsecase interface {

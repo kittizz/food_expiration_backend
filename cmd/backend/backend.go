@@ -68,6 +68,7 @@ func Run(firebaseCredentials []byte) {
 			usecase.NewThumbnail,
 			usecase.NewItemUsecase,
 			usecase.NewCategoryUsecase,
+			usecase.NewAdminUsecase,
 
 			http_middleware.NewHttpMiddleware,
 
@@ -78,12 +79,21 @@ func Run(firebaseCredentials []byte) {
 			http.NewThumbnailHandler,
 			http.NewItemHandler,
 			http.NewCategoryHandler,
+			http.NewAdminHandler,
 
 			woker.NewNotificationWorker,
 		),
 
 		//Lazy invoked
-		fx.Invoke(func(*http.UserHandler, *http.BlogHandler, *http.LocationHandler, *http.ImageHandler, *http.ThumbnailHandler, *http.ItemHandler, *http.CategoryHandler, *woker.NotificationWorker) {
+		fx.Invoke(func(
+			//http handlers
+			*http.UserHandler, *http.BlogHandler, *http.LocationHandler,
+			*http.ImageHandler, *http.ThumbnailHandler, *http.ItemHandler,
+			*http.CategoryHandler, *http.AdminHandler,
+
+			//workers
+			*woker.NotificationWorker,
+		) {
 		}),
 	)
 
