@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 
+	"gorm.io/gorm"
+
 	"github.com/kittizz/food_expiration_backend/internal/domain"
 	"github.com/kittizz/food_expiration_backend/internal/pkg/database"
 )
@@ -47,4 +49,18 @@ func (repo *CategoryRepository) List(ctx context.Context) ([]*domain.Category, e
 		return nil, err
 	}
 	return categories, nil
+}
+
+func (repo *CategoryRepository) Set(ctx context.Context, categories []*domain.Category) error {
+	err := repo.db.Session(&gorm.Session{AllowGlobalUpdate: true}).
+		Unscoped().
+		Model(&domain.Category{}).
+		Delete(&domain.Category{}).Error
+
+	if err != nil {
+		return err
+	}
+	err = repo.db.Create(&categories).Error
+	return err
+
 }

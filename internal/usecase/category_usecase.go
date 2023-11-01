@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"strings"
 
 	"github.com/kittizz/food_expiration_backend/internal/domain"
 )
@@ -43,4 +44,12 @@ func (uc *CategoryUsecase) List(ctx context.Context) ([]string, error) {
 		names = append(names, category.Name)
 	}
 	return names, nil
+}
+func (uc *CategoryUsecase) Set(ctx context.Context, categories string) error {
+	split := strings.Split(categories, "\\n")
+	var categorys []*domain.Category
+	for _, category := range split {
+		categorys = append(categorys, &domain.Category{Name: category})
+	}
+	return uc.repo.Set(ctx, categorys)
 }

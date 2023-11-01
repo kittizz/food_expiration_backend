@@ -21,6 +21,7 @@ type CategoryRepository interface {
 	Delete(ctx context.Context, category Category) error
 	Update(ctx context.Context, category Category, id int) error
 	List(ctx context.Context) ([]*Category, error)
+	Set(ctx context.Context, categories []*Category) error
 }
 
 type CategoryUsecase interface {
@@ -28,5 +29,6 @@ type CategoryUsecase interface {
 	Get(ctx context.Context, id int) (*Category, error)
 	Delete(ctx context.Context, category Category) error
 	Update(ctx context.Context, category Category, id int) error
+	Set(ctx context.Context, categories string) error
 	List(ctx context.Context) ([]string, error)
 }
