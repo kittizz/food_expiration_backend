@@ -23,9 +23,14 @@ type Blog struct {
 type BlogRepository interface {
 	List(ctx context.Context, isRandom bool, limit int) ([]*Blog, error)
 	GetByID(ctx context.Context, id int) (*Blog, error)
+	Update(ctx context.Context, blog Blog, id int) (int, error)
+	Delete(ctx context.Context, id int) error
 }
 
 type BlogUsecase interface {
 	List(ctx context.Context, isRandom bool, limit int) ([]*Blog, error)
 	GetByID(ctx context.Context, id int) (*Blog, error)
+	Rename(ctx context.Context, name string, id int) error
+	UpdateOrCreate(ctx context.Context, blog Blog, id int) (int, error)
+	Delete(ctx context.Context, id int) error
 }

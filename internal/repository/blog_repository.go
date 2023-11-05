@@ -31,6 +31,7 @@ func (r *BlogRepository) List(ctx context.Context, isRandom bool, limit int) ([]
 	if err != nil {
 		return nil, err
 	}
+
 	return blogs, nil
 }
 
@@ -43,4 +44,36 @@ func (r *BlogRepository) GetByID(ctx context.Context, id int) (*domain.Blog, err
 		return nil, err
 	}
 	return &blog, nil
+}
+func (r *BlogRepository) Update(ctx context.Context, blog domain.Blog, id int) (int, error) {
+	q := r.db.WithContext(ctx).Model(&blog).Where(domain.Blog{
+		ID: id,
+	})
+
+	if id != 0 {
+		err := q.Updates(domain.Blog{
+			Title:   blog.Title,
+			Content: blog.Content,
+			ImageID: blog.ImageID,
+		}).Error
+		if err != nil {
+			return blog.ID, err
+		}
+		return blog.ID, nil
+	}
+	err := q.Create(&blog).Error
+	if err != nil {
+		return blog.ID, err
+	}
+	return blog.ID, nil
+
+}
+func (r *BlogRepository) Delete(ctx context.Context, id int) error {
+	err := r.db.WithContext(ctx).Unscoped().Where(domain.Blog{
+		ID: id,
+	}).Delete(&domain.Blog{}).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
