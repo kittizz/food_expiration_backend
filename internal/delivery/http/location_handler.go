@@ -75,11 +75,11 @@ func (h *LocationHandler) CreateLocation(c echo.Context) error {
 	}
 
 	if req.ImageId == 0 {
-		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดอัปโหลดรูปหรือเลือกจากคลัง"})
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "Please upload an image or select one from the library"})
 	}
 
 	if req.Name == "" {
-		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดกรอกชื่อสถานที่"})
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "Please enter the name of the location"})
 	}
 	location := domain.Location{
 		Name:        &req.Name,
@@ -87,6 +87,7 @@ func (h *LocationHandler) CreateLocation(c echo.Context) error {
 		ImageID:     req.ImageId,
 		UserID:      user.ID,
 	}
+
 	if err := h.locationUsecase.Create(c.Request().Context(), location); err != nil {
 		return c.JSON(request.StatusCode(err), request.ResponseError{Message: err.Error()})
 	}
@@ -121,12 +122,13 @@ func (h *LocationHandler) UpdateLocation(c echo.Context) error {
 	}
 
 	if req.ImageId == 0 {
-		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดอัปโหลดรูปหรือเลือกจากคลัง"})
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "Please upload an image or select from the gallery"})
 	}
 
 	if req.Name == "" {
-		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "โปรดกรอกชื่อสถานที่"})
+		return c.JSON(http.StatusBadRequest, request.ResponseError{Message: "Please enter the name of the place"})
 	}
+
 	location := domain.Location{
 		Name:        &req.Name,
 		Description: &req.Description,

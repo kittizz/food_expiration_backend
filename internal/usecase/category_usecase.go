@@ -46,7 +46,7 @@ func (uc *CategoryUsecase) List(ctx context.Context) ([]string, error) {
 	return names, nil
 }
 func (uc *CategoryUsecase) Set(ctx context.Context, categories string) error {
-	split := strings.Split(categories, "\\n")
+	split := strings.Split(categories, "\n")
 	var categorys []*domain.Category
 	for _, category := range split {
 		categorys = append(categorys, &domain.Category{Name: category})

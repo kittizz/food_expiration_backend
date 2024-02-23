@@ -36,6 +36,9 @@ func (n *NotificationAt) UnmarshalJSON(b []byte) error {
 	return nil
 }
 func (n *NotificationAt) Scan(value any) error {
+	if _, ok := value.(float64); ok {
+		return nil
+	}
 	td, err := time.ParseDuration(fmt.Sprintf("%dm", value.(int64)))
 	if err != nil {
 		return err

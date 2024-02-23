@@ -150,7 +150,7 @@ func (w *NotificationWorker) run() {
 		group.Submit(func() error {
 			parameterData, _ := json.Marshal(map[string]any{
 				"isLocation": false,
-				"title":      "รายการทั้งหมด",
+				"title":      "All items",
 				"locationId": 0,
 				"isScan":     false,
 				"isSearch":   false,
